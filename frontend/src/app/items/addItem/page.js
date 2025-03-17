@@ -1,5 +1,6 @@
 "use client";
 
+import { Input } from "@/components/ui/input"
 import useItemsApi from "@/api/ItemsApi";
 import { useState } from "react";
 import {
@@ -37,55 +38,44 @@ const AddItem = () => {
   };
 
   return (
-<>
-  <Card>
-  <CardHeader>
-    <CardTitle> Add Item</CardTitle>
-    {/* <CardDescription>Card Description</CardDescription> */}
-  </CardHeader>
-  <CardContent>
-    <p>Card Content</p>
-  </CardContent>
-  <CardFooter>
-  <Button variant="outline">Button</Button>
-  </CardFooter>
-</Card>
-    <form onSubmit={handleAddItem}>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {success && <p style={{ color: "green" }}>{success}</p>}
-
-      <input
-        type="text"
-        name="code"
-        value={item.code}
-        onChange={handleChange}
-        placeholder="Code"
-        required
-      />
-      <input
-        type="text"
-        name="name"
-        value={item.name}
-        onChange={handleChange}
-        placeholder="Item Name"
-        required
-      />    
-      <input
-        type="text"
-        name="description"
-        value={item.description}
-        onChange={handleChange}
-        placeholder="Description"
-        required
-      />
-      <button
-        type="submit"
-        disabled={!item.code || !item.name || !item.description}
-      >
-        Add Item
-      </button>
-    </form>
-    </>
+      <Card>
+        <CardHeader>
+          <CardTitle>Add Item</CardTitle>
+          {/* <CardDescription>Card Description</CardDescription> */}
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleAddItem}>
+            <Input type="text"
+              name="code"
+              value={item.code}
+              onChange={handleChange}
+              placeholder="Code"
+              required
+            />
+            <Input type="text"
+              name="name"
+              value={item.name}
+              onChange={handleChange}
+              placeholder="Item Name"
+              required
+            />
+            <Input type="text"
+              name="description"
+              value={item.description}
+              onChange={handleChange}
+              placeholder="Description"
+              required
+            />
+          </form>
+        </CardContent>
+        <CardFooter>
+        <Button variant="outline" type="submit"
+              disabled={!item.code || !item.name || !item.description}
+            >
+              Add Item
+            </Button>
+        </CardFooter>
+      </Card>
   );
 };
 
