@@ -3,7 +3,7 @@
 import useItemsApi from "@/api/ItemsApi";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-
+import DataViewer from "@/app/components/DataViewer";
 
 export default function ItemDetail() {
   const { ItemID } = useParams();

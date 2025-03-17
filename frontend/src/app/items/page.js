@@ -26,12 +26,6 @@ export default function Items() {
     fetchItems();
   }, []);
 
-  // const handleEditItem = (items) => {
-  //   toast.info(`Editing user: ${items.name}`, {
-  //     description: "You can modify the user details.",
-  //   });
-  // };
-
   const handleDeleteItem = (items) => {
     toast.error(`Deleting user: ${items.name}`, {
       description: "This action cannot be undone.",
@@ -91,7 +85,6 @@ export default function Items() {
       cell: ({ row }) => (
         <DataTableRowActions
           row={row}
-          // viewPath={`items/${row.original.code}`}
           onEdit={`items/${row.original.code}`}
           onDelete={handleDeleteItem}
         />
