@@ -91,7 +91,7 @@ const OverlaySidebar = () => {
       hasDropdown: true,
       items: [
         { label: "Salesmen List", href: "/salesmen" },
-        { label: "Add New", href: "/salesmen/addSalesmen" },
+        { label: "Add Salemen", href: "/salesmen/addSalesmen" },
       ],
     },
     {
