@@ -13,7 +13,6 @@ const useCustomersApi = () => {
     let body;
     let headers = {
       Authorization: `Bearer ${Token}`,
-      Accept: "application/json",
     };
 
     if (customerData.photo) {
@@ -59,6 +58,7 @@ const useCustomersApi = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Token}`,
+          Accept: "application/json"
         },
       });
       if (!response.ok) {
@@ -73,6 +73,7 @@ const useCustomersApi = () => {
   };
 
   const deleteCustomer = async (id) => {
+    const Token = getToken();
     if (!Token) {
       throw new Error("No auth token found");
     }
@@ -82,6 +83,7 @@ const useCustomersApi = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Token}`,
+          Accept: "application/json"
         },
       });
       if (!response.ok) {
@@ -95,6 +97,7 @@ const useCustomersApi = () => {
   };
 
   const updateCustomer = async (id, updatedData) => {
+    const Token = getToken();
     if (!Token) {
       throw new Error("No auth token found");
     }
@@ -104,6 +107,7 @@ const useCustomersApi = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Token}`,
+          Accept: "application/json"
         },
         body: JSON.stringify(updatedData),
       });
@@ -119,6 +123,7 @@ const useCustomersApi = () => {
   };
 
   const showCustomer = async (id) => {
+    const Token = getToken();
     if (!Token) {
       throw new Error("No auth token found");
     }
@@ -128,6 +133,7 @@ const useCustomersApi = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Token}`,
+          Accept: "application/json",
         },
       });
       if (!response.ok) {
@@ -144,6 +150,7 @@ const useCustomersApi = () => {
   };
 
   const bulkDeleteCustomers = async (ids) => {
+    const Token = getToken();
     if (!Token) {
       throw new Error("No auth token found");
     }
@@ -153,6 +160,7 @@ const useCustomersApi = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Token}`,
+          Accept: "application/json",
         },
         body: JSON.stringify({ ids }),
       });

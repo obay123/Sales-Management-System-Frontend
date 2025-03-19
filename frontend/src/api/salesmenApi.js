@@ -40,6 +40,7 @@ const useSalesmenApi = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Token}`,
+          Accept: "application/json",
         },
       });
       if (!response.ok) {
@@ -63,6 +64,7 @@ const useSalesmenApi = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Token}`,
+          Accept: "application/json",
         },
       });
       if (!response.ok) {
@@ -87,6 +89,7 @@ const useSalesmenApi = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Token}`,
+          Accept: "application/json",
         },
         body: JSON.stringify(updatedData),
       });
@@ -111,6 +114,7 @@ const useSalesmenApi = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Token}`,
+          Accept: "application/json",
         },
       });
       if (!response.ok) {
@@ -129,11 +133,12 @@ const useSalesmenApi = () => {
       throw new Error("No auth token found");
     }
     try {
-      const response = await fetch(`${API_URL}/bulk-delete`, {
+      const response = await fetch(`http://127.0.0.1:8000/api/saleman/bulk-delete`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Token}`,
+          Accept: "application/json",
         },
         body: JSON.stringify({ ids }),
       });

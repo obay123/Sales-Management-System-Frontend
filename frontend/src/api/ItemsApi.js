@@ -14,7 +14,7 @@ const useItemsApi = () => {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          Authorization: `Bearer ${Token}`,
+          Authorization: `Bearer ${Token}`
         },
         body: JSON.stringify(item),
       });
@@ -40,6 +40,7 @@ const useItemsApi = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Token}`,
+          Accept: "application/json"
         },
       });
       if (!response.ok) {
@@ -65,6 +66,7 @@ const useItemsApi = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Token}`,
+          Accept: "application/json"
         },
       });
       if (!response.ok) {
@@ -88,6 +90,7 @@ const useItemsApi = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Token}`,
+          Accept: "application/json"
         },
         body: JSON.stringify(updatedData),
       });
@@ -112,6 +115,7 @@ const useItemsApi = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Token}`,
+          Accept: "application/json"
         },
       });
       if (!response.ok) {
@@ -136,8 +140,9 @@ const useItemsApi = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Token}`,
+          Accept: "application/json"
         },
-        body: JSON.stringify({ ids }),
+        body: JSON.stringify( {ids} ),
       });
       if (!response.ok) {
         const errorData = await response.json();

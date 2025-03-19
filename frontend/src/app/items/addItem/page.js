@@ -23,7 +23,6 @@ const AddItemPage = () => {
   const { addItem } = useItemsApi();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Initialize form with react-hook-form and zod validation
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {

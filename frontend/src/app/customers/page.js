@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { useEffect, useState } from "react";
 import useCustomersApi from "@/api/CustomersApi";
@@ -8,37 +8,52 @@ import { DataTableColumnHeader } from "../components/data-table/data-table-colum
 import { DataTableRowActions } from "../components/data-table/data-table-row-actions";
 import { toast } from "sonner";
 
-
 export default function Customers() {
   const [customers, setCustomers] = useState([]);
+  const { getCustomers, deleteCustomer, bulkDeleteCustomers } =
+    useCustomersApi();
 
   useEffect(() => {
-    const fetchCustomers = async () => {
-      try {
-        const { getCustomers } = useCustomersApi();
-        const data = await getCustomers();
-        setCustomers(data.customers.data);
-      } catch (error) {
-        console.error("Error fetching customers:", error);
-      }
-    };
     fetchCustomers();
   }, []);
 
-  const handleEditUser = (user) => {
-    toast.info(`Editing user: ${user.name}`, {
-      description: "You can modify the user details.",
-    });
+  const fetchCustomers = async () => {
+    try {
+      const data = await getCustomers();
+      if (data?.customers?.data) {
+        setCustomers(data.customers.data);
+      } else {
+        setCustomers([]);
+      }
+    } catch (error) {
+      console.error("Error fetching customers:", error);
+    }
   };
-  // Handle delete user
-  const handleDeleteUser = (user) => {
-    toast.error(`Deleting user: ${user.name}`, {
-      description: "This action cannot be undone.",
-      action: {
-        label: "Undo",
-        onClick: () => console.log("Undo delete"),
-      },
-    });
+
+  const handleDeleteCustomer = async (id) => {
+    try {
+      await deleteCustomer(id);
+      setCustomers((prevCustomers) =>
+        prevCustomers.filter((customers) => customers.id !== id)
+      );
+      toast.success("Customer deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting Customer:", error);
+      toast.error("Failed to delete Customer.");
+    }
+  };
+
+  const handleBulkDeleteCustomers = async (ids) => {
+    try {
+      await bulkDeleteCustomers(ids);
+      setCustomers((prevCustomers) =>
+        prevCustomers.filter((customers) => !ids.includes(customers.code))
+      );
+      toast.success(`${ids.length} Customer deleted successfully!`);
+    } catch (error) {
+      console.error("Error deleting Customer:", error);
+      toast.error("Failed to delete selected Customer.");
+    }
   };
 
   const columns = [
@@ -85,7 +100,7 @@ export default function Customers() {
       ),
       enableSorting: true,
     },
-    
+
     {
       accessorKey: "name",
       header: ({ column }) => (
@@ -154,9 +169,8 @@ export default function Customers() {
       cell: ({ row }) => (
         <DataTableRowActions
           row={row}
-          viewPath="/example/users"
-          onEdit={handleEditUser}
-          onDelete={handleDeleteUser}
+          onEdit={`customers/${row.original.id}`}
+          onDelete={() => handleDeleteCustomer(row.original.id)}
         />
       ),
     },
@@ -164,9 +178,14 @@ export default function Customers() {
 
   return (
     <div className="container mx-auto py-10">
-      <DataTable columns={columns} data={customers} filterColumn="name" />
+      <DataTable
+        columns={columns}
+        data={customers}
+        filterColumn="name"
+        onDeleteSelected={handleBulkDeleteCustomers}
+        addUrl="/customers/addCustomer"
+        addName="Add Customer"
+      />
     </div>
   );
 }
-
-

@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowDown, ArrowUp, ArrowUpDown, EyeOff } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -8,10 +8,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
 
 export function DataTableColumnHeader({ column, title, className }) {
   if (!column.getCanSort()) {
@@ -45,11 +43,6 @@ export function DataTableColumnHeader({ column, title, className }) {
           <DropdownMenuItem onClick={() => column.toggleSorting(true)}>
             <ArrowDown className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
             Desc
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
-            <EyeOff className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-            Hide
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

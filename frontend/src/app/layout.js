@@ -13,18 +13,6 @@ export default function RootLayout({ children }) {
   const isAuthPage = noLayoutPages.includes(pathname);
   const [isHydrated, setIsHydrated] = useState(false);
 
-  useEffect(() => {
-    setIsHydrated(true);
-  }, []);
-
-  if (!isHydrated) {
-    return (
-      <html lang="en">
-        <body></body>
-      </html>
-    );
-  }
-
   return (
     <html lang="en">
       <body>

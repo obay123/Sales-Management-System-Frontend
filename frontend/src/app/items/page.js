@@ -8,32 +8,49 @@ import { DataTableColumnHeader } from "../components/data-table/data-table-colum
 import { DataTableRowActions } from "../components/data-table/data-table-row-actions";
 import { toast } from "sonner";
 
-
-
 export default function Items() {
+  const { getItems, deleteItem, bulkDeleteItems } = useItemsApi();
   const [items, setItems] = useState([]);
 
   useEffect(() => {
-    const fetchItems = async () => {
-      try {
-        const { getItems } = useItemsApi();
-        const data = await getItems();
-        setItems(data.items.data);
-      } catch (error) {
-        console.error("Error fetching items", error);
-      }
-    };
     fetchItems();
   }, []);
 
-  const handleDeleteItem = (items) => {
-    toast.error(`Deleting user: ${items.name}`, {
-      description: "This action cannot be undone.",
-      action: {
-        label: "Undo",
-        onClick: () => console.log("Undo delete"),
-      },
-    });
+  const fetchItems = async () => {
+    try {
+      const data = await getItems();
+      if (data?.items?.data) {
+        setItems(data.items.data);
+      } else {
+        setItems([]);
+      }
+    } catch (error) {
+      console.error("Error fetching items", error);
+    }
+  };
+
+  const handleDeleteItem = async (id) => {
+    try {
+      await deleteItem(id);
+      setItems((prevItems) => prevItems.filter((item) => item.id !== id));
+      toast.success("Item deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting items:", error);
+      toast.error("Failed to delete item.");
+    }
+  };
+
+  const handleBulkDeleteItems = async (ids) => {
+    try {
+      await bulkDeleteItems(ids);
+      setItems((prevItems) =>
+        prevItems.filter((item) => !ids.includes(item.code))
+      );
+      toast.success(`${ids.length} items deleted successfully!`);
+    } catch (error) {
+      console.error("Error deleting items:", error);
+      toast.error("Failed to delete selected items.");
+    }
   };
 
   const columns = [
@@ -86,7 +103,7 @@ export default function Items() {
         <DataTableRowActions
           row={row}
           onEdit={`items/${row.original.code}`}
-          onDelete={handleDeleteItem}
+          onDelete={() => handleDeleteItem(row.original.code)}
         />
       ),
     },
@@ -94,7 +111,7 @@ export default function Items() {
 
   return (
     <div className="container mx-auto py-10">
-      <DataTable columns={columns} data={items} filterColumn="name" />
+      <DataTable columns={columns} data={items} filterColumn="name" onDeleteSelected={handleBulkDeleteItems} addUrl="/items/addItem" addName="Add Item"/>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { useEffect, useState } from "react";
 import useSalesmenApi from "@/api/salesmenApi";
@@ -8,38 +8,53 @@ import { DataTableColumnHeader } from "../components/data-table/data-table-colum
 import { DataTableRowActions } from "../components/data-table/data-table-row-actions";
 import { toast } from "sonner";
 
-import "../globals.css";
-
 export default function Salesmen() {
-  const [Salesmen, setSalesmen] = useState([]);
+  const { getSalesmen, deleteSalesmen, bulkDeleteSalesmen } = useSalesmenApi();
+  const [salesmen, setSalesmen] = useState([]);
 
   useEffect(() => {
-    const fetchSalesmen = async () => {
-      try {
-        const { getSalesmen } = useSalesmenApi();
-        const data = await getSalesmen();
-        setSalesmen(data.salesmen.data);
-      } catch (error) {
-        console.error("Error fetching items:", error);
-      }
-    };
     fetchSalesmen();
   }, []);
 
-  const handleEditUser = (user) => {
-    toast.info(`Editing user: ${user.name}`, {
-      description: "You can modify the user details.",
-    });
+  const fetchSalesmen = async () => {
+    try {
+      const data = await getSalesmen();
+
+      if (data?.salesmen?.data) {
+        setSalesmen(data.salesmen.data);
+      } else {
+        setSalesmen([]);
+      }
+    } catch (error) {
+      console.error("Error fetching salesmen:", error);
+    }
   };
-  // Handle delete user
-  const handleDeleteUser = (user) => {
-    toast.error(`Deleting user: ${user.name}`, {
-      description: "This action cannot be undone.",
-      action: {
-        label: "Undo",
-        onClick: () => console.log("Undo delete"),
-      },
-    });
+
+  const handleDeleteSalemen = async (id) => {
+    try {
+      await deleteSalesmen(id);
+      setSalesmen((prevSalesmen) =>
+        prevSalesmen.filter((salesmen) => salesmen.code !== id)
+      );
+      toast.success("Salesmen deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting Salesmen:", error);
+      toast.error("Failed to delete Salesmen.");
+    }
+  };
+
+  const handleBulkDeleteSalesmen = async (ids) => {
+    try {
+      console.log("Deleting salesmen with IDs:", ids);
+      await bulkDeleteSalesmen(ids);
+      setSalesmen((prevSalesmen) =>
+        prevSalesmen.filter((salesmen) => !ids.includes(salesmen.code))
+      );
+      toast.success(`${ids.length} salesmen deleted successfully!`);
+    } catch (error) {
+      console.error("Error deleting salemen:", error);
+      toast.error("Failed to delete selected salemen.");
+    }
   };
 
   const columns = [
@@ -95,14 +110,20 @@ export default function Salesmen() {
     },
     {
       accessorKey: "is_inactive",
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Active" />,
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Active" />
+      ),
       cell: ({ row }) => {
-        const status = row.getValue("is_inactive")
+        const status = row.getValue("is_inactive");
         return (
           <div className="flex items-center">
-            <div className={`mr-2 h-2 w-2 rounded-full ${status === 0 ? "bg-green-500" : "bg-red-500"}`} />
+            <div
+              className={`mr-2 h-2 w-2 rounded-full ${
+                status === 0 ? "bg-green-500" : "bg-red-500"
+              }`}
+            />
           </div>
-        )
+        );
       },
       enableSorting: true,
     },
@@ -111,9 +132,8 @@ export default function Salesmen() {
       cell: ({ row }) => (
         <DataTableRowActions
           row={row}
-          viewPath="/example/users"
-          onEdit={handleEditUser}
-          onDelete={handleDeleteUser}
+          onEdit={`salesmen/${row.original.code}`}
+          onDelete={() => handleDeleteSalemen(row.original.code)}
         />
       ),
     },
@@ -121,7 +141,14 @@ export default function Salesmen() {
 
   return (
     <div className="container mx-auto py-10">
-      <DataTable columns={columns} data={Salesmen} filterColumn="name" />
+      <DataTable
+        columns={columns}
+        data={salesmen}
+        filterColumn="name"
+        onDeleteSelected={handleBulkDeleteSalesmen}
+        addUrl="/salesmen/addSalesmen"
+        addName="Add Saleman"
+      />
     </div>
   );
 }

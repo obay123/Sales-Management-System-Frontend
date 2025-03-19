@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import { useEffect, useState } from "react";
 import useInvoicesApi from "@/api/InvoicesApi";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -7,40 +7,51 @@ import { DataTableColumnHeader } from "../components/data-table/data-table-colum
 import { DataTableRowActions } from "../components/data-table/data-table-row-actions";
 import { toast } from "sonner";
 
-
-
-
 export default function Invoices() {
-  const [invoices, setInvioces] = useState([]);
+  const [invoices, setInvoices] = useState([]);
+  const { getInvoices, deleteInvoice, bulkDeleteInvoices } = useInvoicesApi();
 
   useEffect(() => {
-    const fetchInvoices = async () => {
-      try {
-        const { getInvoices } = useInvoicesApi();
-        const data = await getInvoices();
-        setInvioces(data.invoices.data);
-        
-      } catch (error) {
-        console.error("Error fetching invoices:", error);
-      }
-    };
     fetchInvoices();
   }, []);
 
-  const handleEditUser = (user) => {
-    toast.info(`Editing user: ${user.name}`, {
-      description: "You can modify the user details.",
-    });
+  const fetchInvoices = async () => {
+    try {
+      const data = await getInvoices();
+      if (data?.invoices?.data) {
+        setInvoices(data.invoices.data);
+      } else {
+        setInvoices([]);
+      }
+    } catch (error) {
+      console.error("Error fetching invoices:", error);
+    }
   };
-  // Handle delete user
-  const handleDeleteUser = (user) => {
-    toast.error(`Deleting user: ${user.name}`, {
-      description: "This action cannot be undone.",
-      action: {
-        label: "Undo",
-        onClick: () => console.log("Undo delete"),
-      },
-    });
+
+  const handleDeleteInvoice = async (id) => {
+    try {
+      await deleteInvoice(id);
+      setInvoices((prevInvoices) =>
+        prevInvoices.filter((Invoice) => Invoice.id !== id)
+      );
+      toast.success("Invoice deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting Invoice:", error);
+      toast.error("Failed to delete Invoice.");
+    }
+  };
+
+  const handleBulkDeleteInvoices = async (ids) => {
+    try {
+      await bulkDeleteInvoices(ids);
+      setInvoices((prevInvoices) =>
+        prevInvoices.filter((Invoice) => !ids.includes(Invoice.id))
+      );
+      toast.success(`${ids.length} Invoices deleted successfully!`);
+    } catch (error) {
+      console.error("Error deleting Invoices:", error);
+      toast.error("Failed to delete selected Invoices.");
+    }
   };
 
   const columns = [
@@ -87,7 +98,7 @@ export default function Invoices() {
       ),
       enableSorting: true,
     },
-    
+
     {
       accessorKey: "total_quantity",
       header: ({ column }) => (
@@ -114,17 +125,22 @@ export default function Invoices() {
       cell: ({ row }) => (
         <DataTableRowActions
           row={row}
-          viewPath="/example/users"
-          onEdit={handleEditUser}
-          onDelete={handleDeleteUser}
+          onEdit={`invoices/${row.original.id}`}
+          onDelete={() => handleDeleteInvoice(row.original.id)}
         />
       ),
     },
   ];
   return (
     <div className="container mx-auto py-10">
-      <DataTable columns={columns} data={invoices} filterColumn="id" />
+      <DataTable
+        columns={columns}
+        data={invoices}
+        filterColumn="id"
+        onDeleteSelected={handleBulkDeleteInvoices}
+        addUrl="/invoices/addInvoice"
+        addName="Add Invoice"
+      />
     </div>
   );
 }
-
