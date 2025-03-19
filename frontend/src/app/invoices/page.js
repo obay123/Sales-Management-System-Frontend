@@ -65,6 +65,7 @@ export default function Invoices() {
           }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
+          className="cursor-pointer"
         />
       ),
       cell: ({ row }) => (
@@ -72,6 +73,7 @@ export default function Invoices() {
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
           aria-label="Select row"
+          className="cursor-pointer"
         />
       ),
       enableSorting: false,

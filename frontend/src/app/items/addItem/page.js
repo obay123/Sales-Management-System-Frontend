@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useState } from "react";
 import useItemsApi from "@/api/ItemsApi";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -7,8 +7,22 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { toast } from "sonner";
 import { CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 
@@ -34,19 +48,18 @@ const AddItemPage = () => {
 
   const onSubmit = async (values) => {
     setIsSubmitting(true);
-    
+
     try {
       await addItem(values);
-      
+
       // Show success toast with Sonner
       toast.success("Item added successfully!", {
         description: `Item "${values.name}" has been created.`,
         duration: 5000,
       });
-      
+
       // Reset form
       form.reset();
-      
     } catch (error) {
       // Show error toast with Sonner
       toast.error("Error adding item", {
@@ -60,14 +73,15 @@ const AddItemPage = () => {
 
   return (
     <div className="container max-w-2xl mx-auto py-10 px-4">
-      <Card>
+      <Card className="w-full border shadow-lg dark:border-gray-800 dark:bg-gray-800">
         <CardHeader>
           <CardTitle className="text-2xl">Add New Item</CardTitle>
           <CardDescription>
-            Create a new item with a unique code, name, and optional description.
+            Create a new item with a unique code, name, and optional
+            description.
           </CardDescription>
         </CardHeader>
-        
+
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -87,7 +101,7 @@ const AddItemPage = () => {
                   </FormItem>
                 )}
               />
-                
+
               <FormField
                 control={form.control}
                 name="name"
@@ -104,7 +118,7 @@ const AddItemPage = () => {
                   </FormItem>
                 )}
               />
-                
+
               <FormField
                 control={form.control}
                 name="description"
@@ -112,10 +126,10 @@ const AddItemPage = () => {
                   <FormItem>
                     <FormLabel>Description</FormLabel>
                     <FormControl>
-                      <Textarea 
-                        placeholder="Enter item description (optional)" 
+                      <Textarea
+                        placeholder="Enter item description (optional)"
                         className="resize-none min-h-32"
-                        {...field} 
+                        {...field}
                       />
                     </FormControl>
                     <FormDescription>
@@ -125,7 +139,7 @@ const AddItemPage = () => {
                   </FormItem>
                 )}
               />
-              
+
               <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting ? (
                   <>
@@ -140,7 +154,6 @@ const AddItemPage = () => {
           </Form>
         </CardContent>
       </Card>
-      
     </div>
   );
 };

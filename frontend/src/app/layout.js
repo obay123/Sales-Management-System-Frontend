@@ -14,7 +14,7 @@ export default function RootLayout({ children }) {
 
   return (
     <html lang="en">
-      <body>
+      <body className="dark:bg-gray-900">
         <Toaster position="top-center" richColors />
         <ProtectedRoute>
           {!isAuthPage && <OverlaySidebar />}

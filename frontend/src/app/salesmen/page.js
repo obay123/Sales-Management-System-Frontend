@@ -68,6 +68,7 @@ export default function Salesmen() {
           }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
+          className="cursor-pointer"
         />
       ),
       cell: ({ row }) => (
@@ -75,6 +76,7 @@ export default function Salesmen() {
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
           aria-label="Select row"
+          className="cursor-pointer"
         />
       ),
       enableSorting: false,
@@ -144,7 +146,7 @@ export default function Salesmen() {
       <DataTable
         columns={columns}
         data={salesmen}
-        filterColumn="name"
+        filterColumn="code"
         onDeleteSelected={handleBulkDeleteSalesmen}
         addUrl="/salesmen/addSalesmen"
         addName="Add Saleman"

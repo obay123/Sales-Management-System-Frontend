@@ -15,7 +15,7 @@ export function DataTableViewOptions({ table }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="ml-auto h-8 lg:flex">
+        <Button variant="outline" size="sm" className="cursor-pointer ml-auto h-8 lg:flex">
           <SlidersHorizontal className="mr-2 h-4 w-4" />
           View
         </Button>

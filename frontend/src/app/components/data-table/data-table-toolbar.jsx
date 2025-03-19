@@ -18,7 +18,7 @@ export function DataTableToolbar({ table, filterColumn, addUrl, addName }) {
           onChange={(event) =>
             table.getColumn(filterColumn)?.setFilterValue(event.target.value)
           }
-          className="h-8 w-[200px] lg:w-[250px]" 
+          className="h-8 w-[200px] lg:w-[250px]"
         />
 
         {isFiltered && (
@@ -34,7 +34,7 @@ export function DataTableToolbar({ table, filterColumn, addUrl, addName }) {
       </div>
 
       <Button
-        variant="default" 
+        variant="outline"
         size="sm"
         onClick={() => router.push(`${addUrl}`)}
         className="h-8 px-3 flex items-center gap-2 cursor-pointer"

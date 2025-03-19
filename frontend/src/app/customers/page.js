@@ -47,7 +47,7 @@ export default function Customers() {
     try {
       await bulkDeleteCustomers(ids);
       setCustomers((prevCustomers) =>
-        prevCustomers.filter((customers) => !ids.includes(customers.code))
+        prevCustomers.filter((customers) => !ids.includes(customers.id))
       );
       toast.success(`${ids.length} Customer deleted successfully!`);
     } catch (error) {
@@ -67,6 +67,7 @@ export default function Customers() {
           }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
+          className="cursor-pointer"
         />
       ),
       cell: ({ row }) => (
@@ -74,6 +75,7 @@ export default function Customers() {
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
           aria-label="Select row"
+          className="cursor-pointer"
         />
       ),
       enableSorting: false,
@@ -181,7 +183,7 @@ export default function Customers() {
       <DataTable
         columns={columns}
         data={customers}
-        filterColumn="name"
+        filterColumn="id"
         onDeleteSelected={handleBulkDeleteCustomers}
         addUrl="/customers/addCustomer"
         addName="Add Customer"

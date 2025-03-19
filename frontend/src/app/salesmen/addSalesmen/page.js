@@ -68,7 +68,7 @@ const AddSalesmanPage = () => {
 
   return (
     <div className="container max-w-2xl mx-auto py-10 px-4">
-      <Card>
+      <Card className="w-full border shadow-lg dark:border-gray-800 dark:bg-gray-800">
         <CardHeader>
           <CardTitle className="text-2xl">Add New Salesman</CardTitle>
           <CardDescription>
@@ -156,7 +156,7 @@ const AddSalesmanPage = () => {
                         Mark as inactive if this salesman is not currently active.
                       </FormDescription>
                     </div>
-                    <FormControl>
+                    <FormControl className="cursor-pointer">
                       <Switch
                         checked={field.value}
                         onCheckedChange={field.onChange}

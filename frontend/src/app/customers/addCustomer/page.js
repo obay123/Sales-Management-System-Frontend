@@ -130,7 +130,7 @@ const AddCustomerPage = () => {
 
   return (
     <div className="container max-w-4xl mx-auto py-10 px-4">
-      <Card>
+      <Card className="w-full border shadow-lg dark:border-gray-800 dark:bg-gray-800">
         <CardHeader>
           <CardTitle className="text-2xl">Create New Customer</CardTitle>
           <CardDescription>Add a new customer with their personal and contact information.</CardDescription>
@@ -216,7 +216,6 @@ const AddCustomerPage = () => {
                         <SelectContent>
                           <SelectItem value="male">Male</SelectItem>
                           <SelectItem value="female">Female</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -280,7 +279,7 @@ const AddCustomerPage = () => {
                     <FormItem>
                       <FormLabel>Rate</FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.01" min="0" placeholder="Enter customer rate" {...field} />
+                        <Input type="number" step="1" min="1" max="5" placeholder="Enter customer rate" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -341,7 +340,7 @@ const AddCustomerPage = () => {
               </div>
             </CardContent>
 
-            <CardFooter className="flex justify-end space-x-2">
+            <CardFooter className="pt-4 flex justify-end space-x-2">
               <Button variant="outline" type="button" onClick={() => form.reset()}>
                 Cancel
               </Button>

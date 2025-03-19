@@ -50,7 +50,7 @@ const useCustomersApi = () => {
   }
 
   const getCustomersName = async () => {
-    const Token = getToken();
+    const Token = getToken(); 
     if (!Token) {
       throw new Error("No auth token found");
     }

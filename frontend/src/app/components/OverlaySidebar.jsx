@@ -23,11 +23,12 @@ import {
 } from "lucide-react";
 
 const OverlaySidebar = () => {
-  const { logout } = userApi();
+  const { logout, getUserDetails } = userApi();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
   const [openDropdown, setOpenDropdown] = useState(null);
+  const [ userDetails, setUserDetails] = useState([])
 
   const handleLogout = async () => {
     try {
@@ -37,6 +38,23 @@ const OverlaySidebar = () => {
       console.error("Logout failed:", error.message);
     }
   };
+
+    useEffect(() => {
+      fetchUserDetails();
+    }, []);
+
+  const fetchUserDetails = async () => {
+    try {
+      const data = await getUserDetails();
+      if(data?.user){
+        setUserDetails(data.user);
+      } else{
+        setUserDetails([]);
+      }
+    }catch (error) {
+      console.error("Error fetching user:", error);
+    }
+  }
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -144,7 +162,7 @@ const OverlaySidebar = () => {
       <button
         id="menu-button"
         onClick={toggleSidebar}
-        className="cursor-pointer fixed top-4 left-4 z-30 p-2.5 rounded-full bg-gray-800 text-white shadow-lg hover:shadow-black/30 dark:hover:shadow-black/40 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-105 group"
+        className="cursor-pointer fixed top-4 left-4 z-30 p-2.5 rounded-full bg-gray-800 text-white shadow-lg hover:shadow-black/30 dark:hover:shadow-black/40 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all duration-200 transform hover:scale-105 group"
         aria-label="Toggle sidebar"
       >
         <Menu
@@ -162,23 +180,23 @@ const OverlaySidebar = () => {
 
       <div
         id="sidebar"
-        className={`fixed top-0 left-0 h-full w-80 bg-white dark:bg-gray-800 shadow-xl z-50 transform transition-all duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 h-full w-80 bg-white dark:bg-gray-900 shadow-xl z-50 transform transition-all duration-300 ease-in-out ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="flex flex-col h-full">
-          <div className="flex items-center justify-between p-5 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between p-5 border-b border-gray-200 dark:border-gray-800">
             <div className="flex items-center space-x-2">
-              <div className="h-8 w-8 bg-gradient-to-br from-gray-500 to-black rounded-lg flex items-center justify-center">
-                <ShoppingCart size={16} color="white" className="text-white" />
+              <div className="h-8 w-8 bg-gradient-to-br from-gray-600 to-gray-900 dark:from-gray-500 dark:to-gray-800 rounded-lg flex items-center justify-center">
+                <ShoppingCart size={16} className="text-white" />
               </div>
-              <h2 className="text-lg font-bold dark:text-white">
+              <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">
                 Sales Management
               </h2>
             </div>
             <button
               onClick={toggleSidebar}
-              className="cursor-pointer p-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+              className="cursor-pointer p-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all duration-200"
               aria-label="Close sidebar"
             >
               <X size={20} className="text-gray-500 dark:text-gray-400" />
@@ -201,15 +219,15 @@ const OverlaySidebar = () => {
                         className={`cursor-pointer flex items-center justify-between w-full p-3 rounded-lg transition-all duration-200
                           ${
                             isActive
-                              ? "bg-black-50 text-blue-700 dark:bg-black-900/30 dark:text-black-300 font-medium"
-                              : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                              ? "bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100 font-medium"
+                              : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                           }`}
                       >
                         <div className="flex items-center">
                           <span
                             className={`${
                               isActive
-                                ? "text-black dark:text-black"
+                                ? "text-gray-800 dark:text-gray-200"
                                 : "text-gray-500 dark:text-gray-400"
                             } mr-3`}
                           >
@@ -223,7 +241,7 @@ const OverlaySidebar = () => {
                             isDropdownOpen ? "rotate-180" : ""
                           } ${
                             isActive
-                              ? "text-black dark:text-black-400"
+                              ? "text-gray-800 dark:text-gray-200"
                               : "text-gray-500 dark:text-gray-400"
                           }`}
                         />
@@ -234,15 +252,15 @@ const OverlaySidebar = () => {
                         className={`flex items-center justify-between p-3 rounded-lg transition-all duration-200
                           ${
                             isActive
-                              ? "bg-blue-50 text-black-700 dark:bg-blue-900/30 dark:text-black-300 font-medium"
-                              : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                              ? "bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100 font-medium"
+                              : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                           }`}
                       >
                         <div className="flex items-center">
                           <span
                             className={`${
                               isActive
-                                ? "text-black-600 dark:text-black-400"
+                                ? "text-gray-800 dark:text-gray-200"
                                 : "text-gray-500 dark:text-gray-400"
                             } mr-3`}
                           >
@@ -253,7 +271,7 @@ const OverlaySidebar = () => {
                         {isActive && (
                           <ChevronRight
                             size={16}
-                            className="text-black-600 dark:text-black-400"
+                            className="text-gray-800 dark:text-gray-200"
                           />
                         )}
                       </Link>
@@ -277,12 +295,12 @@ const OverlaySidebar = () => {
                                   className={`block p-2 rounded-md text-sm transition-all duration-200
                                     ${
                                       isSubActive
-                                        ? "bg-blue-50 text-black-700 dark:bg-black-900/20 dark:text-black-900 font-medium"
-                                        : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                        ? "bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100 font-medium"
+                                        : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
                                     }`}
                                 >
                                   <div className="flex items-center">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 mr-2"></span>
+                                    <span className={`w-1.5 h-1.5 rounded-full ${isSubActive ? "bg-gray-600 dark:bg-gray-300" : "bg-gray-400 dark:bg-gray-600"} mr-2`}></span>
                                     {item.label}
                                   </div>
                                 </Link>
@@ -300,7 +318,7 @@ const OverlaySidebar = () => {
             <div className="mt-6">
               <button
                 onClick={toggleDarkMode}
-                className="flex items-center justify-between w-full p-3 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200"
+                className="flex items-center justify-between w-full p-3 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-200"
               >
                 <div className="flex items-center">
                   {isDarkMode ? (
@@ -312,7 +330,7 @@ const OverlaySidebar = () => {
                 </div>
                 <div
                   className={`cursor-pointer w-10 h-5 rounded-full ${
-                    isDarkMode ? "bg-blue-600" : "bg-gray-300"
+                    isDarkMode ? "bg-gray-600" : "bg-gray-300"
                   } relative transition-colors duration-200`}
                 >
                   <div
@@ -325,21 +343,21 @@ const OverlaySidebar = () => {
             </div>
           </nav>
 
-          <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="p-4 border-t border-gray-200 dark:border-gray-800">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center overflow-hidden">
+                <div className="h-10 w-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden">
                   <User
                     size={20}
-                    className="text-blue-600 dark:text-blue-400"
+                    className="text-gray-600 dark:text-gray-400"
                   />
                 </div>
                 <div>
-                  <p className="text-sm font-medium dark:text-white">
-                    John Doe
+                  <p className="text-sm font-medium text-gray-800 dark:text-gray-100">
+                  {userDetails.name}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    Sales Manager
+                  {userDetails.email}
                   </p>
                 </div>
               </div>

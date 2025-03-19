@@ -20,6 +20,18 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { CheckCircle } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
@@ -57,20 +69,17 @@ export function DataTable({
     },
   });
 
-  // Get selected rows
   const selectedRows = table.getFilteredSelectedRowModel().rows;
   const hasSelectedRows = selectedRows.length > 0;
 
-  // Handle bulk delete
   const handleBulkDelete = async () => {
     if (typeof onDeleteSelected === "function") {
       const selectedIds = selectedRows.map(
         (row) => row.original.id ?? row.original.code
       );
-      
-      // ✅ Extract IDs only
-      await onDeleteSelected(selectedIds); // ✅ Call parent function
-      setRowSelection({}); // ✅ Clear selection after delete
+
+      await onDeleteSelected(selectedIds);
+      setRowSelection({});
     }
   };
 
@@ -89,21 +98,45 @@ export function DataTable({
       </div>
 
       {hasSelectedRows && (
-        <div className="flex items-center justify-between bg-muted/50 px-4 py-2 rounded-md">
-          <span className="text-sm font-medium">
-            {selectedRows.length} {selectedRows.length === 1 ? "row" : "rows"}{" "}
-            selected
-          </span>
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={handleBulkDelete}
-            className="h-8"
-          >
-            <Trash className="h-4 w-4 mr-2" />
-            Delete Selected
-          </Button>
-        </div>
+        <AlertDialog>
+          <div className="flex items-center justify-between bg-muted/50 px-4 py-2 rounded-md">
+            <span className="text-sm font-medium">
+              {selectedRows.length} {selectedRows.length === 1 ? "row" : "rows"}{" "}
+              selected
+            </span>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="destructive"
+                size="sm"
+                className="cursor-pointer h-8"
+              >
+                <Trash className="h-4 w-4 mr-2" />
+                Delete Selected
+              </Button>
+            </AlertDialogTrigger>
+          </div>
+
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This action cannot be undone. It will permanently delete{" "}
+                {selectedRows.length} selected items.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel className="cursor-pointer">
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction
+                className="cursor-pointer"
+                onClick={handleBulkDelete}
+              >
+                <CheckCircle className="h-4 w-4" /> Confirm
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       )}
 
       <div className="rounded-md border">

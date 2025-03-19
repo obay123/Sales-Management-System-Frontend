@@ -32,7 +32,7 @@ export default function Items() {
   const handleDeleteItem = async (id) => {
     try {
       await deleteItem(id);
-      setItems((prevItems) => prevItems.filter((item) => item.id !== id));
+      setItems((prevItems) => prevItems.filter((item) => item.code !== id));
       toast.success("Item deleted successfully!");
     } catch (error) {
       console.error("Error deleting items:", error);
@@ -53,6 +53,7 @@ export default function Items() {
     }
   };
 
+
   const columns = [
     {
       id: "select",
@@ -64,6 +65,7 @@ export default function Items() {
           }
           onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
           aria-label="Select all"
+          className="cursor-pointer"
         />
       ),
       cell: ({ row }) => (
@@ -71,6 +73,7 @@ export default function Items() {
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
           aria-label="Select row"
+          className="cursor-pointer"
         />
       ),
       enableSorting: false,
@@ -111,7 +114,14 @@ export default function Items() {
 
   return (
     <div className="container mx-auto py-10">
-      <DataTable columns={columns} data={items} filterColumn="name" onDeleteSelected={handleBulkDeleteItems} addUrl="/items/addItem" addName="Add Item"/>
+      <DataTable
+        columns={columns}
+        data={items}
+        filterColumn="code"
+        onDeleteSelected={handleBulkDeleteItems}
+        addUrl="/items/addItem"
+        addName="Add Item"
+      />
     </div>
   );
 }

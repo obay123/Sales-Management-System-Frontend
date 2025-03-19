@@ -51,7 +51,29 @@ const userApi = () => {
       throw error.message;
     }
   };
-  return { logout, login, register };
+
+  const getUserDetails = async () => {
+    const Token = localStorage.getItem("Token");
+    if (!Token) {
+      throw new Error("No auth token found");
+    }
+    try {
+      const response = await fetch("/api/user-details", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Token}`,
+        },
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message);
+      return data;
+    } catch (error) {
+      throw error.message;
+    }
+  };
+
+  return { logout, login, register, getUserDetails };
 };
 
 export default userApi;

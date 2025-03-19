@@ -151,7 +151,7 @@ const AddInvoicePage = () => {
 
   return (
     <div className="container max-w-4xl mx-auto py-10 px-4">
-      <Card>
+      <Card className="w-full border shadow-lg dark:border-gray-800 dark:bg-gray-800">
         <CardHeader>
           <CardTitle className="text-2xl">Create New Invoice</CardTitle>
           <CardDescription>Add a new invoice with customer details and item information.</CardDescription>
