@@ -116,12 +116,12 @@ const useInvoicesApi = () => {
       });
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to update invoice");
+        throw new Error(errorData.message || "Failed to show invoice");
       }
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error("Error updating invoice:", error.message);
+      console.error("Error show invoice:", error.message);
       throw error;
     }
   };
