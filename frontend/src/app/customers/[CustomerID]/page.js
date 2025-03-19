@@ -43,15 +43,14 @@ const formSchema = z.object({
 
 const EditCustomerPage = () => {
   const params = useParams()
-  console.log(params)
-   const customerId = params?.CustomerID
+  const customerId = params?.CustomerID
   const { updateCustomer, showCustomer } = useCustomersApi()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [photoPreview, setPhotoPreview] = useState(null)
   const [originalPhotoUrl, setOriginalPhotoUrl] = useState(null)
   const [photoChanged, setPhotoChanged] = useState(false)
-
+  const [photoRemoved, setPhotoRemoved] = useState(false)
 
   // Initialize form with react-hook-form and zod validation
   const form = useForm({
@@ -141,6 +140,7 @@ const EditCustomerPage = () => {
     form.setValue("photo", undefined)
     setPhotoPreview(null)
     setPhotoChanged(true)
+    setPhotoRemoved(true)
     // Reset the file input
     const fileInput = document.querySelector('input[type="file"]')
     if (fileInput) {
@@ -156,9 +156,18 @@ const EditCustomerPage = () => {
         ...values,
         subscription_date: format(values.subscription_date, "yyyy-MM-dd"),
         rate: Number.parseFloat(values.rate),
-        // Only include photo if it was changed
-        ...(photoChanged ? {} : { photo: null }),
       }
+
+      // Handle photo changes
+      if (photoRemoved) {
+        // If photo was removed, explicitly set photo to null or empty string
+        // depending on what your API expects for removal
+        customerData.photo = null // or "" if your API expects empty string
+      } else if (!photoChanged) {
+        // If photo wasn't changed, don't include it in the update
+        delete customerData.photo
+      }
+      // If photo was changed but not removed, keep the File object
 
       // Log the data being sent (for debugging)
       console.log("Updating customer data:", customerData)

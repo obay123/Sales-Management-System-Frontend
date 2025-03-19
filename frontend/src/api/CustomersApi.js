@@ -121,31 +121,97 @@ const useCustomersApi = () => {
     }
   };
 
+  // const updateCustomer = async (id, updatedData) => {
+  //   const Token = getToken();
+  //   if (!Token) {
+  //     throw new Error("No auth token found");
+  //   }
+  //   try {
+  //     const response = await fetch(`${API_URL}/${id}`, {
+  //       method: "PUT",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         Authorization: `Bearer ${Token}`,
+  //         Accept: "application/json"
+  //       },
+  //       body: JSON.stringify(updatedData),
+  //     });
+  //     if (!response.ok) {
+  //       const errorData = await response.json();
+  //       throw new Error(errorData.message || "Failed to update customer");
+  //     }
+  //     return await response.json();
+  //   } catch (error) {
+  //     console.error("Error updating customer:", error.message);
+  //     throw error;
+  //   }
+  // };
   const updateCustomer = async (id, updatedData) => {
-    const Token = getToken();
+    const Token = getToken()
     if (!Token) {
-      throw new Error("No auth token found");
+      throw new Error("No auth token found")
     }
+  
     try {
-      const response = await fetch(`${API_URL}/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Token}`,
-          Accept: "application/json"
-        },
-        body: JSON.stringify(updatedData),
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to update customer");
+      // Check if we have a File object for photo
+      if (updatedData.photo instanceof File) {
+        // Use FormData for file uploads
+        const formData = new FormData()
+  
+        // Add all other fields to FormData
+        Object.keys(updatedData).forEach((key) => {
+          if (key === "photo") {
+            formData.append("photo", updatedData.photo)
+          } else if (key === "tags" && Array.isArray(updatedData[key])) {
+            // Handle tags array
+            updatedData[key].forEach((tag) => {
+              formData.append("tags[]", tag)
+            })
+          } else if (updatedData[key] !== null && updatedData[key] !== undefined) {
+            formData.append(key, updatedData[key])
+          }
+        })
+  
+        const response = await fetch(`${API_URL}/${id}`, {
+          method: "PUT", // Use POST with _method=PUT for Laravel/PHP backends
+          headers: {
+            Authorization: `Bearer ${Token}`,
+            Accept: "application/json",
+            // Don't set Content-Type with FormData, browser will set it with boundary
+          },
+          body: formData,
+        })
+  
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.message || "Failed to update customer")
+        }
+  
+        return await response.json()
+      } else {
+        // Regular JSON request for non-file updates
+        const response = await fetch(`${API_URL}/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${Token}`,
+            Accept: "application/json",
+          },
+          body: JSON.stringify(updatedData),
+        })
+  
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.message || "Failed to update customer")
+        }
+  
+        return await response.json()
       }
-      return await response.json();
     } catch (error) {
-      console.error("Error updating customer:", error.message);
-      throw error;
+      console.error("Error updating customer:", error.message)
+      throw error
     }
-  };
+  }
 
   const showCustomer = async (id) => {
     const Token = getToken();
