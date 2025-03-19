@@ -153,8 +153,8 @@ const OverlaySidebar = () => {
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between p-5 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center space-x-2">
-              <div className="h-8 w-8 bg-gradient-to-br from-blue-500 to-blue-700 rounded-lg flex items-center justify-center">
-                <ShoppingCart size={16} className="text-white" />
+              <div className="h-8 w-8 bg-gradient-to-br from-gray-500 to-black rounded-lg flex items-center justify-center">
+                <ShoppingCart size={16} color="white" className="text-white" />
               </div>
               <h2 className="text-lg font-bold dark:text-white">
                 Sales Management
@@ -185,7 +185,7 @@ const OverlaySidebar = () => {
                         className={`flex items-center justify-between w-full p-3 rounded-lg transition-all duration-200
                           ${
                             isActive
-                              ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 font-medium"
+                              ? "bg-black-50 text-blue-700 dark:bg-black-900/30 dark:text-black-300 font-medium"
                               : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                           }`}
                       >
@@ -193,7 +193,7 @@ const OverlaySidebar = () => {
                           <span
                             className={`${
                               isActive
-                                ? "text-blue-600 dark:text-blue-400"
+                                ? "text-black dark:text-black"
                                 : "text-gray-500 dark:text-gray-400"
                             } mr-3`}
                           >
@@ -207,7 +207,7 @@ const OverlaySidebar = () => {
                             isDropdownOpen ? "rotate-180" : ""
                           } ${
                             isActive
-                              ? "text-blue-600 dark:text-blue-400"
+                              ? "text-black dark:text-black-400"
                               : "text-gray-500 dark:text-gray-400"
                           }`}
                         />
@@ -218,7 +218,7 @@ const OverlaySidebar = () => {
                         className={`flex items-center justify-between p-3 rounded-lg transition-all duration-200
                           ${
                             isActive
-                              ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 font-medium"
+                              ? "bg-blue-50 text-black-700 dark:bg-blue-900/30 dark:text-black-300 font-medium"
                               : "text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                           }`}
                       >
@@ -226,7 +226,7 @@ const OverlaySidebar = () => {
                           <span
                             className={`${
                               isActive
-                                ? "text-blue-600 dark:text-blue-400"
+                                ? "text-black-600 dark:text-black-400"
                                 : "text-gray-500 dark:text-gray-400"
                             } mr-3`}
                           >
@@ -237,7 +237,7 @@ const OverlaySidebar = () => {
                         {isActive && (
                           <ChevronRight
                             size={16}
-                            className="text-blue-600 dark:text-blue-400"
+                            className="text-black-600 dark:text-black-400"
                           />
                         )}
                       </Link>
@@ -261,7 +261,7 @@ const OverlaySidebar = () => {
                                   className={`block p-2 rounded-md text-sm transition-all duration-200
                                     ${
                                       isSubActive
-                                        ? "bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300 font-medium"
+                                        ? "bg-blue-50 text-black-700 dark:bg-black-900/20 dark:text-black-900 font-medium"
                                         : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                                     }`}
                                 >

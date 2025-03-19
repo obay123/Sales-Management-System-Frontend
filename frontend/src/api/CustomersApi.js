@@ -47,6 +47,30 @@ const useCustomersApi = () => {
     }
   };
 
+  const getCustomersName = async () => {
+    const Token = getToken();
+    if (!Token) {
+      throw new Error("No auth token found");
+    }
+    try {
+      const response = await fetch(`${API_URL}/names`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Token}`,
+          Accept:"application/json"
+        },
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to fetch customers names");
+      }
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching customers names:", error.message);
+      throw error;
+    }
+  };
   const getCustomers = async () => {
     const Token = getToken();
     if (!Token) {
@@ -58,7 +82,6 @@ const useCustomersApi = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Token}`,
-          Accept: "application/json"
         },
       });
       if (!response.ok) {
@@ -182,6 +205,7 @@ const useCustomersApi = () => {
     updateCustomer,
     showCustomer,
     bulkDeleteCustomers,
+    getCustomersName
   };
 };
 

@@ -1,64 +1,29 @@
 "use client"
-import React, { useState, useEffect } from "react";
-import useInvoicesApi from "@/api/InvoicesApi";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, useFieldArray } from "react-hook-form";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon, Loader2, Plus, Trash2 } from "lucide-react";
-import { format } from "date-fns";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@/components/ui/command";
-import { Toaster, toast } from "sonner";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { cn } from "@/lib/utils";
-
+import { useState, useEffect } from "react"
+import useInvoicesApi from "@/api/InvoicesApi"
+import useItemsApi from "@/api/ItemsApi"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm, useFieldArray } from "react-hook-form"
+import * as z from "zod"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Calendar } from "@/components/ui/calendar"
+import { CalendarIcon, Loader2, Plus, Trash2 } from "lucide-react"
+import { format } from "date-fns"
+import useCustomersApi from "@/api/CustomersApi"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
+import { Toaster, toast } from "sonner"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { cn } from "@/lib/utils"
 // Define form validation schema using Zod
 const invoiceItemSchema = z.object({
   item_code: z.string().min(1, { message: "Item code is required" }),
-  quantity: z.coerce
-    .number()
-    .positive({ message: "Quantity must be positive" }),
-  unit_price: z.coerce
-    .number()
-    .nonnegative({ message: "Price cannot be negative" }),
-});
+  quantity: z.coerce.number().positive({ message: "Quantity must be positive" }),
+  unit_price: z.coerce.number().nonnegative({ message: "Price cannot be negative" }),
+})
 
 const formSchema = z.object({
   customer_id: z.string().min(1, { message: "Customer is required" }),
@@ -66,13 +31,17 @@ const formSchema = z.object({
   items: z.array(invoiceItemSchema).min(1, {
     message: "At least one item is required",
   }),
-});
+})
 
 const AddInvoicePage = () => {
-  const { addInvoice } = useInvoicesApi();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [customers, setCustomers] = useState([]);
-  const [isLoadingCustomers, setIsLoadingCustomers] = useState(true);
+  const { addInvoice } = useInvoicesApi()
+  const { getItemsCode } = useItemsApi()
+  const { getCustomersName } = useCustomersApi()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [customers, setCustomers] = useState([])
+  const [items, setItems] = useState([])
+  const [isLoadingCustomers, setIsLoadingCustomers] = useState(true)
+  const [isLoadingItems, setIsLoadingItems] = useState(true)
 
   // Initialize form with react-hook-form and zod validation
   const form = useForm({
@@ -82,37 +51,66 @@ const AddInvoicePage = () => {
       date: new Date(),
       items: [{ item_code: "", quantity: 1, unit_price: 0 }],
     },
-  });
+  })
 
   // Setup field array for dynamic invoice items
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "items",
-  });
+  })
 
-  // Fetch customers on component mount
   useEffect(() => {
-    const fetchCustomers = async () => {
-      setIsLoadingCustomers(true);
+    const fetchCustomerNames = async () => {
+      setIsLoadingCustomers(true)
       try {
-        // Use the provided getCustomers function
-        const customersData = await getCustomers();
-        setCustomers(customersData);
+        const data = await getCustomersName()
+        console.log("Customer data received:", data)
+        if (data && Array.isArray(data.customers)) {
+          setCustomers(data.customers)
+        } else {
+          console.error("Invalid customers data format:", data)
+          setCustomers([])
+        }
       } catch (error) {
+        console.error("Error fetching customers:", error)
         toast.error("Failed to load customers", {
           description: error.message,
-        });
+        })
+        setCustomers([])
       } finally {
-        setIsLoadingCustomers(false);
+        setIsLoadingCustomers(false)
       }
-    };
+    }
+    fetchCustomerNames()
+  }, [])
 
-    fetchCustomers();
-  }, []);
+  useEffect(() => {
+    const fetchItemsCode = async () => {
+      setIsLoadingItems(true)
+      try {
+        const data = await getItemsCode()
+        console.log("Items data received:", data)
+        if (data && Array.isArray(data.items)) {
+          setItems(data.items)
+        } else {
+          console.error("Invalid items data format:", data)
+          setItems([])
+        }
+      } catch (error) {
+        console.error("Error fetching items:", error)
+        toast.error("Failed to load items", {
+          description: error.message,
+        })
+        setItems([])
+      } finally {
+        setIsLoadingItems(false)
+      }
+    }
+    fetchItemsCode()
+  }, [])
 
   const onSubmit = async (values) => {
-    setIsSubmitting(true);
-
+    setIsSubmitting(true)
     try {
       // Format the data as required by your API
       const invoiceData = {
@@ -120,48 +118,43 @@ const AddInvoicePage = () => {
         date: format(values.date, "yyyy-MM-dd"),
         items: values.items.map((item) => ({
           item_code: item.item_code,
-          quantity: parseInt(item.quantity),
-          unit_price: parseFloat(item.unit_price),
+          quantity: Number.parseInt(item.quantity),
+          unit_price: Number.parseFloat(item.unit_price),
         })),
-      };
+      }
 
-      await addInvoice(invoiceData);
+      await addInvoice(invoiceData)
 
       toast.success("Invoice added successfully", {
-        description: `Invoice for customer ${values.customer_id} has been created.`,
-      });
+        description: `Invoice has been created successfully.`,
+      })
 
       // Reset form to initial state
       form.reset({
         customer_id: "",
         date: new Date(),
         items: [{ item_code: "", quantity: 1, unit_price: 0 }],
-      });
+      })
     } catch (error) {
       toast.error("Error adding invoice", {
         description: error.message || "Please try again",
-      });
+      })
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   // Calculate invoice total
   const calculateTotal = () => {
-    return form.watch("items").reduce(
-      (sum, item) => sum + (Number(item.quantity) * Number(item.unit_price) || 0),
-      0
-    );
-  };
+    return form.watch("items").reduce((sum, item) => sum + (Number(item.quantity) * Number(item.unit_price) || 0), 0)
+  }
 
   return (
     <div className="container max-w-4xl mx-auto py-10 px-4">
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Create New Invoice</CardTitle>
-          <CardDescription>
-            Add a new invoice with customer details and item information.
-          </CardDescription>
+          <CardDescription>Add a new invoice with customer details and item information.</CardDescription>
         </CardHeader>
 
         <Form {...form}>
@@ -181,16 +174,13 @@ const AddInvoicePage = () => {
                             <Button
                               variant="outline"
                               role="combobox"
-                              className={cn(
-                                "w-full justify-between",
-                                !field.value && "text-muted-foreground"
-                              )}
+                              className={cn("w-full justify-between", !field.value && "text-muted-foreground")}
                               disabled={isLoadingCustomers}
                             >
                               {isLoadingCustomers ? (
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                               ) : field.value ? (
-                                customers.find((customer) => customer.id === field.value)?.name ||
+                                customers.find((customer) => customer.id.toString() === field.value)?.name ||
                                 "Select customer"
                               ) : (
                                 "Select customer"
@@ -202,20 +192,31 @@ const AddInvoicePage = () => {
                         <PopoverContent className="w-[300px] p-0">
                           <Command>
                             <CommandInput placeholder="Search customers..." />
-                            <CommandEmpty>No customer found.</CommandEmpty>
-                            <CommandGroup>
-                              {customers.map((customer) => (
-                                <CommandItem
-                                  key={customer.id}
-                                  value={customer.name}
-                                  onSelect={() => {
-                                    form.setValue("customer_id", customer.id);
-                                  }}
-                                >
-                                  {customer.name}
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
+                            <CommandList>
+                              <CommandEmpty>No customer found.</CommandEmpty>
+                              <CommandGroup>
+                                {Array.isArray(customers) &&
+                                  customers.map((customer) => (
+                                    <CommandItem
+                                      key={customer.id}
+                                      value={customer.name}
+                                      onSelect={(currentValue) => {
+                                        const selectedCustomer = customers.find(
+                                          (c) => c.name.toLowerCase() === currentValue.toLowerCase(),
+                                        )
+                                        if (selectedCustomer) {
+                                          form.setValue("customer_id", selectedCustomer.id.toString(), {
+                                            shouldValidate: true,
+                                            shouldDirty: true,
+                                          })
+                                        }
+                                      }}
+                                    >
+                                      {customer.name}
+                                    </CommandItem>
+                                  ))}
+                              </CommandGroup>
+                            </CommandList>
                           </Command>
                         </PopoverContent>
                       </Popover>
@@ -238,25 +239,16 @@ const AddInvoicePage = () => {
                               variant="outline"
                               className={cn(
                                 "w-full pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
+                                !field.value && "text-muted-foreground",
                               )}
                             >
-                              {field.value ? (
-                                format(field.value, "PPP")
-                              ) : (
-                                <span>Pick a date</span>
-                              )}
+                              {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
                               <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                             </Button>
                           </FormControl>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            initialFocus
-                          />
+                          <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus />
                         </PopoverContent>
                       </Popover>
                       <FormMessage />
@@ -269,17 +261,17 @@ const AddInvoicePage = () => {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <FormLabel className="text-base">Invoice Items</FormLabel>
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
                     onClick={() => append({ item_code: "", quantity: 1, unit_price: 0 })}
                   >
                     <Plus className="mr-1 h-4 w-4" />
                     Add Item
                   </Button>
                 </div>
-                
+
                 <div className="border rounded-md">
                   <Table>
                     <TableHeader>
@@ -300,7 +292,60 @@ const AddInvoicePage = () => {
                               render={({ field }) => (
                                 <FormItem className="mb-0">
                                   <FormControl>
-                                    <Input {...field} placeholder="Enter item code" className="w-full" />
+                                    <Popover>
+                                      <PopoverTrigger asChild>
+                                        <FormControl>
+                                          <Button
+                                            variant="outline"
+                                            role="combobox"
+                                            className={cn(
+                                              "w-full justify-between",
+                                              !field.value && "text-muted-foreground",
+                                            )}
+                                            disabled={isLoadingItems}
+                                          >
+                                            {isLoadingItems ? (
+                                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            ) : field.value ? (
+                                              items.find((item) => item.code === field.value)?.name || "Select item"
+                                            ) : (
+                                              "Select item"
+                                            )}
+                                            <CalendarIcon className="ml-2 h-4 w-4 opacity-50" />
+                                          </Button>
+                                        </FormControl>
+                                      </PopoverTrigger>
+                                      <PopoverContent className="w-[300px] p-0">
+                                        <Command>
+                                          <CommandInput placeholder="Search items..." />
+                                          <CommandList>
+                                            <CommandEmpty>No item found.</CommandEmpty>
+                                            <CommandGroup>
+                                              {Array.isArray(items) &&
+                                                items.map((item) => (
+                                                  <CommandItem
+                                                    key={item.code}
+                                                    value={item.name}
+                                                    onSelect={(currentValue) => {
+                                                      const selectedItem = items.find(
+                                                        (i) => i.name.toLowerCase() === currentValue.toLowerCase(),
+                                                      )
+                                                      if (selectedItem) {
+                                                        form.setValue(`items.${index}.item_code`, selectedItem.code, {
+                                                          shouldValidate: true,
+                                                          shouldDirty: true,
+                                                        })
+                                                      }
+                                                    }}
+                                                  >
+                                                    {item.name}
+                                                  </CommandItem>
+                                                ))}
+                                            </CommandGroup>
+                                          </CommandList>
+                                        </Command>
+                                      </PopoverContent>
+                                    </Popover>
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
@@ -314,12 +359,7 @@ const AddInvoicePage = () => {
                               render={({ field }) => (
                                 <FormItem className="mb-0">
                                   <FormControl>
-                                    <Input 
-                                      {...field} 
-                                      type="number" 
-                                      min="1" 
-                                      className="w-full" 
-                                    />
+                                    <Input {...field} type="number" min="1" className="w-full" />
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
@@ -333,13 +373,7 @@ const AddInvoicePage = () => {
                               render={({ field }) => (
                                 <FormItem className="mb-0">
                                   <FormControl>
-                                    <Input 
-                                      {...field} 
-                                      type="number" 
-                                      step="0.01" 
-                                      min="0" 
-                                      className="w-full" 
-                                    />
+                                    <Input {...field} type="number" step="0.01" min="0" className="w-full" />
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
@@ -379,11 +413,7 @@ const AddInvoicePage = () => {
             </CardContent>
 
             <CardFooter className="flex justify-end space-x-2">
-              <Button 
-                variant="outline" 
-                type="button"
-                onClick={() => form.reset()}
-              >
+              <Button variant="outline" type="button" onClick={() => form.reset()}>
                 Cancel
               </Button>
               <Button type="submit" disabled={isSubmitting}>
@@ -404,41 +434,7 @@ const AddInvoicePage = () => {
       {/* Sonner Toaster component */}
       <Toaster richColors closeButton position="top-right" />
     </div>
-  );
-};
+  )
+}
+export default AddInvoicePage
 
-// Mock function for getCustomers - replace with your actual implementation
-const getCustomers = async () => {
-  const Token = getToken();
-  if (!Token) {
-    throw new Error("No auth token found");
-  }
-  try {
-    const response = await fetch(`${API_URL}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${Token}`,
-        Accept :"application/json"
-      },
-    });
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Failed to fetch customers");
-    }
-    return await response.json();
-  } catch (error) {
-    console.error("Error fetching customers:", error.message);
-    throw error;
-  }
-};
-
-// Helper function to get token (you should replace this with your actual implementation)
-const getToken = () => {
-  return localStorage.getItem('Token');
-};
-
-// API_URL constant (replace with your actual API URL)
-const API_URL = '/customers';
-
-export default AddInvoicePage;
