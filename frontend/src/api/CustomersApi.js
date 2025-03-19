@@ -12,7 +12,9 @@ const useCustomersApi = () => {
 
     let body;
     let headers = {
+      "Content-Type": "application/json",
       Authorization: `Bearer ${Token}`,
+      Accept:"application/json",
     };
 
     if (customerData.photo) {

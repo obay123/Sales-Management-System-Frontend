@@ -49,7 +49,12 @@ const formSchema = z.object({
   gender: z.string().min(1, { message: "Gender is required" }),
   subscription_date: z.date(),
   rate: z.coerce.number().nonnegative({ message: "Rate cannot be negative" }),
-  tag: z.string().optional(),
+  tags: z
+  .string()
+  .optional()
+  .transform((val) =>
+    val ? val.split(",").map((tag) => tag.trim()).filter((tag) => tag.length) : []
+  ),
   salesmen_code: z.string().min(1, { message: "Salesman code is required" }),
 });
 
@@ -68,7 +73,7 @@ const AddCustomerPage = () => {
       gender: "",
       subscription_date: new Date(),
       rate: 0,
-      tag: "",
+      tags: "",
       salesmen_code: "",
     },
   });
@@ -99,7 +104,7 @@ const AddCustomerPage = () => {
         gender: "",
         subscription_date: new Date(),
         rate: 0,
-        tag: "",
+        tags:"",
         salesmen_code: "",
       });
     } catch (error) {
@@ -296,15 +301,15 @@ const AddCustomerPage = () => {
                   )}
                 />
 
-                {/* Tag */}
+                {/* Tags */}
                 <FormField
                   control={form.control}
-                  name="tag"
+                  name="tags"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Tag (Optional)</FormLabel>
+                      <FormLabel>Tags (Optional)</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter tag" {...field} />
+                        <Input placeholder="Enter tags" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

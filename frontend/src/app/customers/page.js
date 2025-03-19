@@ -158,9 +158,9 @@ export default function Customers() {
       enableSorting: true,
     },
     {
-      accessorKey: "tag",
+      accessorKey: "tags",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Tag" />
+        <DataTableColumnHeader column={column} title="Tags" />
       ),
       enableSorting: true,
     },
