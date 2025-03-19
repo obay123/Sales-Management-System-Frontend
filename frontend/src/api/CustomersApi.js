@@ -4,50 +4,94 @@ const useCustomersApi = () => {
   const getToken = () =>
     typeof window !== "undefined" ? localStorage.getItem("Token") : null;
 
+  // const addCustomer = async (customerData) => {
+  //   const Token = getToken();
+  //   if (!Token) {
+  //     throw new Error("No auth token found");
+  //   }
+
+  //   let body;
+  //   let headers = {
+  //     "Content-Type": "application/json",
+  //     Authorization: `Bearer ${Token}`,
+  //     Accept:"application/json",
+  //   };
+
+  //   if (customerData.photo) {
+  //     body = new FormData();
+  //     Object.keys(customerData).forEach((key) => {
+  //       if (key === "tags") {
+  //         customerData.tags.forEach((tag) => body.append("tags[]", tag));
+  //       } else {
+  //         body.append(key, customerData[key]);
+  //       }
+  //     });
+  //   } else {
+  //     body = JSON.stringify(customerData);
+  //     headers["Content-Type"] = "application/json";
+  //   }
+
+  //   try {
+  //     const response = await fetch(`${API_URL}`, {
+  //       method: "POST",
+  //       headers,
+  //       body,
+  //     });
+
+  //     if (!response.ok) {
+  //       const errorData = await response.json();
+  //       throw new Error(errorData.message || "Failed to add customer");
+  //     }
+  //     return await response.json();
+  //   } catch (error) {
+  //     console.error("Error adding customer:", error.message);
+  //     throw error;
+  //   }
+  // };
+
   const addCustomer = async (customerData) => {
-    const Token = getToken();
+    const Token = getToken()
     if (!Token) {
-      throw new Error("No auth token found");
+      throw new Error("No auth token found")
     }
 
-    let body;
-    let headers = {
+    let body
+    const headers = {
       "Content-Type": "application/json",
       Authorization: `Bearer ${Token}`,
-      Accept:"application/json",
-    };
-
+      Accept: "application/json",
+    }
     if (customerData.photo) {
-      body = new FormData();
+      body = new FormData()
       Object.keys(customerData).forEach((key) => {
         if (key === "tags") {
-          customerData.tags.forEach((tag) => body.append("tags[]", tag));
+          customerData.tags.forEach((tag) => body.append("tags[]", tag))
+        } else if (key === "photo") {
+          body.append("photo", customerData.photo)
         } else {
-          body.append(key, customerData[key]);
+          body.append(key, customerData[key])
         }
-      });
+      })
+      delete headers["Content-Type"]
     } else {
-      body = JSON.stringify(customerData);
-      headers["Content-Type"] = "application/json";
+      body = JSON.stringify(customerData)
     }
-
     try {
-      const response = await fetch(`${API_URL}`, {
+      const response = await fetch(API_URL, {
         method: "POST",
         headers,
         body,
       });
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to add customer");
       }
       return await response.json();
     } catch (error) {
-      console.error("Error adding customer:", error.message);
-      throw error;
+      console.error("Error adding customer:", error.message)
+      throw error
     }
-  };
+  }
 
   const getCustomersName = async () => {
     const Token = getToken();

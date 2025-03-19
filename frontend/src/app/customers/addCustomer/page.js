@@ -1,44 +1,20 @@
-"use client";
-import { useState } from "react";
-import useCustomersApi from "@/api/CustomersApi";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon, Loader2 } from "lucide-react";
-import { format } from "date-fns";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+"use client"
+import { useState } from "react"
+import useCustomersApi from "@/api/CustomersApi"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Calendar } from "@/components/ui/calendar"
+import { CalendarIcon, Loader2, X } from "lucide-react"
+import { format } from "date-fns"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { toast } from "sonner"
+import { cn } from "@/lib/utils"
 
 // Define form validation schema using Zod
 const formSchema = z.object({
@@ -50,17 +26,24 @@ const formSchema = z.object({
   subscription_date: z.date(),
   rate: z.coerce.number().nonnegative({ message: "Rate cannot be negative" }),
   tags: z
-  .string()
-  .optional()
-  .transform((val) =>
-    val ? val.split(",").map((tag) => tag.trim()).filter((tag) => tag.length) : []
-  ),
+    .string()
+    .optional()
+    .transform((val) =>
+      val
+        ? val
+            .split(",")
+            .map((tag) => tag.trim())
+            .filter((tag) => tag.length)
+        : [],
+    ),
   salesmen_code: z.string().min(1, { message: "Salesman code is required" }),
-});
+  photo: z.instanceof(File).optional(),
+})
 
 const AddCustomerPage = () => {
-  const { addCustomer } = useCustomersApi();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { addCustomer } = useCustomersApi()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [photoPreview, setPhotoPreview] = useState(null)
 
   // Initialize form with react-hook-form and zod validation
   const form = useForm({
@@ -75,25 +58,51 @@ const AddCustomerPage = () => {
       rate: 0,
       tags: "",
       salesmen_code: "",
+      photo: undefined,
     },
-  });
+  })
+
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0]
+    if (file) {
+      form.setValue("photo", file)
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setPhotoPreview(reader.result)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const handleRemovePhoto = () => {
+    form.setValue("photo", undefined)
+    setPhotoPreview(null)
+    // Reset the file input
+    const fileInput = document.querySelector('input[type="file"]')
+    if (fileInput) {
+      fileInput.value = ""
+    }
+  }
 
   const onSubmit = async (values) => {
-    setIsSubmitting(true);
+    setIsSubmitting(true)
     try {
       // Prepare the data
       const customerData = {
         ...values,
         subscription_date: format(values.subscription_date, "yyyy-MM-dd"),
         rate: Number.parseFloat(values.rate),
-      };
+      }
+
+      // Log the data being sent (for debugging)
+      console.log("Submitting customer data:", customerData)
 
       // Call API
-      await addCustomer(customerData);
+      await addCustomer(customerData)
 
       toast.success("Customer added successfully", {
         description: `Customer ${values.name} has been created successfully.`,
-      });
+      })
 
       // Reset form
       form.reset({
@@ -104,26 +113,27 @@ const AddCustomerPage = () => {
         gender: "",
         subscription_date: new Date(),
         rate: 0,
-        tags:"",
+        tags: "",
         salesmen_code: "",
-      });
+        photo: undefined,
+      })
+      setPhotoPreview(null)
     } catch (error) {
       toast.error("Error adding customer", {
         description: error.message || "Please try again",
-      });
+      })
+      console.error("Form submission error:", error)
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false)
     }
-  };
+  }
 
   return (
     <div className="container max-w-4xl mx-auto py-10 px-4">
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Create New Customer</CardTitle>
-          <CardDescription>
-            Add a new customer with their personal and contact information.
-          </CardDescription>
+          <CardDescription>Add a new customer with their personal and contact information.</CardDescription>
         </CardHeader>
 
         <Form {...form}>
@@ -168,10 +178,7 @@ const AddCustomerPage = () => {
                     <FormItem>
                       <FormLabel>Primary Phone</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="Enter primary phone number"
-                          {...field}
-                        />
+                        <Input placeholder="Enter primary phone number" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -186,10 +193,7 @@ const AddCustomerPage = () => {
                     <FormItem>
                       <FormLabel>Secondary Phone (Optional)</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="Enter secondary phone number"
-                          {...field}
-                        />
+                        <Input placeholder="Enter secondary phone number" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -203,10 +207,7 @@ const AddCustomerPage = () => {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Gender</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select gender" />
@@ -237,25 +238,16 @@ const AddCustomerPage = () => {
                               variant="outline"
                               className={cn(
                                 "w-full pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground"
+                                !field.value && "text-muted-foreground",
                               )}
                             >
-                              {field.value ? (
-                                format(field.value, "PPP")
-                              ) : (
-                                <span>Pick a date</span>
-                              )}
+                              {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
                               <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                             </Button>
                           </FormControl>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            initialFocus
-                          />
+                          <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus />
                         </PopoverContent>
                       </Popover>
                       <FormMessage />
@@ -288,13 +280,7 @@ const AddCustomerPage = () => {
                     <FormItem>
                       <FormLabel>Rate</FormLabel>
                       <FormControl>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          placeholder="Enter customer rate"
-                          {...field}
-                        />
+                        <Input type="number" step="0.01" min="0" placeholder="Enter customer rate" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -315,15 +301,48 @@ const AddCustomerPage = () => {
                     </FormItem>
                   )}
                 />
+
+                {/* Photo Upload */}
+                <FormField
+                  control={form.control}
+                  name="photo"
+                  render={({ field: { value, onChange, ...fieldProps } }) => (
+                    <FormItem className="col-span-1 md:col-span-2">
+                      <FormLabel>Customer Photo (Optional)</FormLabel>
+                      <FormControl>
+                        <div className="flex flex-col space-y-3">
+                          <Input type="file" accept="image/*" onChange={handlePhotoChange} {...fieldProps} />
+                          {photoPreview && (
+                            <div className="mt-2 relative">
+                              <div className="text-sm text-muted-foreground mb-2">Preview:</div>
+                              <div className="relative inline-block">
+                                <img
+                                  src={photoPreview || "/placeholder.svg"}
+                                  alt="Preview"
+                                  className="h-32 w-32 object-cover rounded-md border"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={handleRemovePhoto}
+                                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600 transition-colors"
+                                  aria-label="Remove photo"
+                                >
+                                  <X className="h-4 w-4" />
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
             </CardContent>
 
             <CardFooter className="flex justify-end space-x-2">
-              <Button
-                variant="outline"
-                type="button"
-                onClick={() => form.reset()}
-              >
+              <Button variant="outline" type="button" onClick={() => form.reset()}>
                 Cancel
               </Button>
               <Button type="submit" disabled={isSubmitting}>
@@ -340,9 +359,8 @@ const AddCustomerPage = () => {
           </form>
         </Form>
       </Card>
-
     </div>
-  );
-};
+  )
+}
 
-export default AddCustomerPage;
+export default AddCustomerPage
