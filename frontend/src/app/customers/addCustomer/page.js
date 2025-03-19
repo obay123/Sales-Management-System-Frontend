@@ -1,135 +1,290 @@
-"use client";
-import { useState } from "react";
-import useCustomersApi from "@/api/CustomersApi";
+"use client"
+import { useState } from "react"
+import useCustomersApi from "@/api/CustomersApi"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Calendar } from "@/components/ui/calendar"
+import { CalendarIcon, Loader2 } from "lucide-react"
+import { format } from "date-fns"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Toaster, toast } from "sonner"
+import { cn } from "@/lib/utils"
+
+// Define form validation schema using Zod
+const formSchema = z.object({
+  name: z.string().min(1, { message: "Name is required" }),
+  tel1: z.string().min(1, { message: "Primary telephone is required" }),
+  tel2: z.string().optional(),
+  address: z.string().min(1, { message: "Address is required" }),
+  gender: z.string().min(1, { message: "Gender is required" }),
+  subscription_date: z.date(),
+  rate: z.coerce.number().nonnegative({ message: "Rate cannot be negative" }),
+  tag: z.string().optional(),
+  salesmen_code: z.string().min(1, { message: "Salesman code is required" }),
+})
 
 const AddCustomerPage = () => {
-  const [formData, setFormData] = useState({
-    salesmen_code: "",
-    name: "",
-    tel1: "",
-    tel2: "",
-    address: "",
-    gender: "",
-    subscription_date: "",
-    rate: "",
-    photo: null,
-    tags: [],
-  });
+  const { addCustomer } = useCustomersApi()
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const { addCustomer } = useCustomersApi();
+  // Initialize form with react-hook-form and zod validation
+  const form = useForm({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      tel1: "",
+      tel2: "",
+      address: "",
+      gender: "",
+      subscription_date: new Date(),
+      rate: 0,
+      tag: "",
+      salesmen_code: "",
+    },
+  })
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleFileChange = (e) => {
-    setFormData((prev) => ({ ...prev, photo: e.target.files[0] }));
-  };
-
-  const handleTagsChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      tags: e.target.value.split(",").map((tags) => tags.trim()),
-    }));
-  };
-
-  const handleAddCustomer = async (e) => {
-    e.preventDefault();
-
+  const onSubmit = async (values) => {
+    setIsSubmitting(true)
     try {
-      await addCustomer(formData);
-      alert("Customer added successfully");
+      // Format the data as required by your API
+      const customerData = {
+        ...values,
+        subscription_date: format(values.subscription_date, "yyyy-MM-dd"),
+        rate: Number.parseFloat(values.rate),
+      }
+
+      await addCustomer(customerData)
+
+      toast.success("Customer added successfully", {
+        description: `Customer ${values.name} has been created successfully.`,
+      })
+
+      // Reset form to initial state
+      form.reset({
+        name: "",
+        tel1: "",
+        tel2: "",
+        address: "",
+        gender: "",
+        subscription_date: new Date(),
+        rate: 0,
+        tag: "",
+        salesmen_code: "",
+      })
     } catch (error) {
-      console.error("Error:", error);
-      alert("Failed to add customer");
+      toast.error("Error adding customer", {
+        description: error.message || "Please try again",
+      })
+    } finally {
+      setIsSubmitting(false)
     }
-  };
+  }
 
   return (
-    <div>
-      <h2>Add Customer</h2>
+    <div className="container max-w-4xl mx-auto py-10 px-4">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-2xl">Create New Customer</CardTitle>
+          <CardDescription>Add a new customer with their personal and contact information.</CardDescription>
+        </CardHeader>
 
-      <form onSubmit={handleAddCustomer} encType="multipart/form-data">
-        <input
-          type="number"
-          name="salesmen_code"
-          placeholder="Salesman Code"
-          value={formData.salesmen_code}
-          onChange={handleChange}
-          required
-        />
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Customer Name */}
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Customer Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter customer name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-        <input
-          type="text"
-          name="name"
-          placeholder="Name"
-          value={formData.name}
-          onChange={handleChange}
-          required
-        />
+                {/* Salesman Code */}
+                <FormField
+                  control={form.control}
+                  name="salesmen_code"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Salesman Code</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter salesman code" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-        <input
-          type="text"
-          name="tel1"
-          placeholder="Phone Number"
-          value={formData.tel1}
-          onChange={handleChange}
-        />
+                {/* Tel1 */}
+                <FormField
+                  control={form.control}
+                  name="tel1"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Primary Phone</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter primary phone number" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-        <input
-          type="text"
-          name="tel2"
-          placeholder="Alternative Phone Number"
-          value={formData.tel2}
-          onChange={handleChange}
-        />
+                {/* Tel2 */}
+                <FormField
+                  control={form.control}
+                  name="tel2"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Secondary Phone (Optional)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter secondary phone number" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-        <input
-          type="text"
-          name="address"
-          placeholder="Address"
-          value={formData.address}
-          onChange={handleChange}
-        />
+                {/* Gender */}
+                <FormField
+                  control={form.control}
+                  name="gender"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Gender</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select gender" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="male">Male</SelectItem>
+                          <SelectItem value="female">Female</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-        <input
-          type="text"
-          name="gender"
-          placeholder="Gender"
-          value={formData.gender}
-          onChange={handleChange}
-        />
+                {/* Subscription Date */}
+                <FormField
+                  control={form.control}
+                  name="subscription_date"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-col">
+                      <FormLabel>Subscription Date</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                "w-full pl-3 text-left font-normal",
+                                !field.value && "text-muted-foreground",
+                              )}
+                            >
+                              {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-        <input
-          type="date"
-          name="subscription_date"
-          placeholder="Subscription Date"
-          value={formData.subscription_date}
-          onChange={handleChange}
-        />
+              {/* Address */}
+              <FormField
+                control={form.control}
+                name="address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Address</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter customer address" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-        <input
-          type="number"
-          name="rate"
-          placeholder="Rate"
-          value={formData.rate}
-          onChange={handleChange}
-        />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Rate */}
+                <FormField
+                  control={form.control}
+                  name="rate"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Rate</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="0.01" min="0" placeholder="Enter customer rate" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-        <input type="file" accept="image/*" onChange={handleFileChange} />
+                {/* Tag */}
+                <FormField
+                  control={form.control}
+                  name="tag"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tag (Optional)</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter tag" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </CardContent>
 
-        <input
-          type="text"
-          placeholder="Enter tag (comma-separated)"
-          value={formData.tags.join(", ")}
-          onChange={handleTagsChange}
-        />
+            <CardFooter className="flex justify-end space-x-2">
+              <Button variant="outline" type="button" onClick={() => form.reset()}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  "Create Customer"
+                )}
+              </Button>
+            </CardFooter>
+          </form>
+        </Form>
+      </Card>
 
-        <button type="submit">Add Customer</button>
-      </form>
+      {/* Sonner Toaster component */}
+      <Toaster richColors closeButton position="top-right" />
     </div>
-  );
-};
+  )
+}
 
-export default AddCustomerPage;
+export default AddCustomerPage

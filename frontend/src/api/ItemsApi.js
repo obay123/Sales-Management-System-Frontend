@@ -150,6 +150,33 @@ const useItemsApi = () => {
     }
   };
 
+  const getItemsCode = async () => {
+    if (!Token) {
+      throw new Error("No auth token found");
+    }
+    try {
+      const response = await fetch(`${API_URL}/names`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Token}`,
+          Accept: "application/json"
+        },
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.message || " response error Failed to fetch items"
+        );
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error fetching items");
+      throw error;
+    }
+  };
+
   return {
     addItem,
     getItems,
@@ -157,6 +184,7 @@ const useItemsApi = () => {
     updateItem,
     showItem,
     bulkDeleteItems,
+    getItemsCode
   };
 };
 export default useItemsApi;
