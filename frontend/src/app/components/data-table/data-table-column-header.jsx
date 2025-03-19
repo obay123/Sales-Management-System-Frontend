@@ -23,7 +23,7 @@ export function DataTableColumnHeader({ column, title, className }) {
           <Button
             variant="ghost"
             size="sm"
-            className="cursor-pointer -ml-5 h-8 data-[state=open]:bg-accent"
+            className="cursor-pointer -ml-3 h-8 data-[state=open]:bg-accent"
           >
             <span>{title}</span>
             {column.getIsSorted() === "desc" ? (

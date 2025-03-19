@@ -198,6 +198,7 @@ export default function Customers() {
         onDeleteSelected={handleBulkDeleteCustomers}
         addUrl="/customers/addCustomer"
         addName="Add Customer"
+        exportName="customers"
       />
     </div>
   );

@@ -150,6 +150,7 @@ export default function Salesmen() {
         onDeleteSelected={handleBulkDeleteSalesmen}
         addUrl="/salesmen/addSalesmen"
         addName="Add Saleman"
+        exportName="saleman"
       />
     </div>
   );

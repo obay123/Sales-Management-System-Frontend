@@ -44,6 +44,7 @@ export function DataTable({
   onDeleteSelected,
   addUrl,
   addName,
+  exportName
 }) {
   const [rowSelection, setRowSelection] = useState({});
   const [columnFilters, setColumnFilters] = useState([]);
@@ -94,7 +95,7 @@ export function DataTable({
             addName={addName}
           />
         )}
-        <DataTableViewOptions table={table} />
+        <DataTableViewOptions table={table} Export={exportName}/>
       </div>
 
       {hasSelectedRows && (

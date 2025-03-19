@@ -121,6 +121,7 @@ export default function Items() {
         onDeleteSelected={handleBulkDeleteItems}
         addUrl="/items/addItem"
         addName="Add Item"
+        exportName="items"
       />
     </div>
   );

@@ -142,6 +142,7 @@ export default function Invoices() {
         onDeleteSelected={handleBulkDeleteInvoices}
         addUrl="/invoices/addInvoice"
         addName="Add Invoice"
+        exportName="invoices"
       />
     </div>
   );
