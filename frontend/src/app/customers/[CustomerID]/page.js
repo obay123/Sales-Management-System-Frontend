@@ -78,7 +78,7 @@ const EditCustomerPage = () => {
         const customer = response.customer
 
         // Format tags from array to comma-separated string
-        const tagsString = customer.tags ? customer.tags.join(", ") : ""
+        const tagsString = customer.tags && Array.isArray(customer.tags) ? customer.tags.join(", ") : ""
 
         // Parse the subscription date
         const subscriptionDate = customer.subscription_date ? parseISO(customer.subscription_date) : new Date()
@@ -97,15 +97,10 @@ const EditCustomerPage = () => {
           // Don't set photo here as it's handled separately
         })
 
-        // If there's a photo, set the preview
-        if (customer.photo) {
-          // Assuming the API returns a full URL or path to the photo
-          const photoUrl = customer.photo.startsWith("http")
-            ? customer.photo
-            : `${process.env.NEXT_PUBLIC_API_BASE_URL}/${customer.photo}`
-
-          setOriginalPhotoUrl(photoUrl)
-          setPhotoPreview(photoUrl)
+        // If there's a photo URL, set the preview
+        if (customer.photo_url) {
+          setOriginalPhotoUrl(customer.photo_url) // Set the full photo URL from the response
+          setPhotoPreview(customer.photo_url)      // Set the preview URL for the image
         }
       } catch (error) {
         toast.error("Error loading customer data", {
@@ -120,7 +115,7 @@ const EditCustomerPage = () => {
     if (customerId) {
       fetchCustomerData()
     }
-  }, [])
+  }, [customerId])
 
   const handlePhotoChange = (e) => {
     const file = e.target.files[0]
@@ -379,54 +374,54 @@ const EditCustomerPage = () => {
                   name="photo"
                   render={({ field: { value, onChange, ...fieldProps } }) => (
                     <FormItem className="col-span-1 md:col-span-2">
-                      <FormLabel>Customer Photo (Optional)</FormLabel>
+                      <FormLabel>Customer Photo</FormLabel>
                       <FormControl>
-                        <div className="flex flex-col space-y-3">
-                          <Input type="file" accept="image/*" onChange={handlePhotoChange} {...fieldProps} />
-                          {photoPreview && (
-                            <div className="mt-2 relative">
-                              <div className="text-sm text-muted-foreground mb-2">
-                                {photoChanged ? "New photo:" : "Current photo:"}
-                              </div>
-                              <div className="relative inline-block">
-                                <img
-                                  src={photoPreview || "/placeholder.svg"}
-                                  alt="Preview"
-                                  className="h-32 w-32 object-cover rounded-md border"
-                                />
-                                <button
-                                  type="button"
-                                  onClick={handleRemovePhoto}
-                                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600 transition-colors"
-                                  aria-label="Remove photo"
-                                >
-                                  <X className="h-4 w-4" />
-                                </button>
-                              </div>
-                            </div>
-                          )}
+                        <div className="flex flex-col space-y-2 items-center">
+                          <div className="w-full max-w-[200px] mx-auto">
+                            {photoPreview && (
+                              <img
+                                className="w-full object-cover h-[200px] rounded-md border"
+                                src={photoPreview}
+                                alt="Customer Photo Preview"
+                              />
+                            )}
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              className="w-full"
+                              onClick={() => document.querySelector('input[type="file"]').click()}
+                            >
+                              Choose Photo
+                            </Button>
+                            {photoPreview && !photoRemoved && (
+                              <Button
+                                variant="destructive"
+                                className="w-full"
+                                onClick={handleRemovePhoto}
+                              >
+                                Remove Photo
+                              </Button>
+                            )}
+                          </div>
+                          <input
+                            type="file"
+                            {...fieldProps}
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handlePhotoChange}
+                          />
                         </div>
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
             </CardContent>
 
-            <CardFooter className="flex justify-end space-x-2">
-              <Button variant="outline" type="button" onClick={() => window.history.back()}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Updating...
-                  </>
-                ) : (
-                  "Update Customer"
-                )}
+            <CardFooter>
+              <Button variant="default" type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Saving..." : "Save Changes"}
               </Button>
             </CardFooter>
           </form>
@@ -437,4 +432,3 @@ const EditCustomerPage = () => {
 }
 
 export default EditCustomerPage
-

@@ -29,7 +29,7 @@ export default function Customers() {
       console.error("Error fetching customers:", error);
     }
   };
-
+  
   const handleDeleteCustomer = async (id) => {
     try {
       await deleteCustomer(id);
@@ -153,11 +153,22 @@ export default function Customers() {
       enableSorting: true,
     },
     {
-      accessorKey: "photo",
+      accessorKey: "photo_url", 
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Photo" />
       ),
-      enableSorting: true,
+      cell: ({ row }) => (
+        row.original.photo_url ? (
+          <img
+            src={row.original.photo_url}
+            alt="Customer"
+            className="w-16 h-16 rounded-full object-cover"
+          />
+        ) : (
+          "No Image"
+        )
+      ),
+      enableSorting: false,
     },
     {
       accessorKey: "tags",

@@ -63,6 +63,7 @@ const userApi = () => {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${Token}`,
+          Accept: "application/json",
         },
       });
       const data = await response.json();

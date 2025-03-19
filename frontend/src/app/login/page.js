@@ -34,10 +34,10 @@ export default function Login() {
     if (typeof window !== "undefined") {
       const savedTheme = localStorage.getItem("theme");
       const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      
+
       const shouldUseDarkMode = savedTheme === "dark" || (!savedTheme && systemPrefersDark);
       setIsDarkMode(shouldUseDarkMode);
-      
+
       if (shouldUseDarkMode) {
         document.documentElement.classList.add("dark");
       } else {
@@ -49,7 +49,7 @@ export default function Login() {
   const toggleDarkMode = () => {
     const newMode = !isDarkMode;
     setIsDarkMode(newMode);
-    
+
     if (newMode) {
       document.documentElement.classList.add("dark");
       localStorage.setItem("theme", "dark");
@@ -70,21 +70,21 @@ export default function Login() {
 
   const onSubmit = async (values) => {
     setIsSubmitting(true);
-    
+
     try {
       const response = await login(values.email, values.password);
       localStorage.setItem("token", response.token);
-      
+
       // Show success toast
       toast.success("Login successful", {
         duration: 3000,
       });
-      
+
       // Redirect to home page
       setTimeout(() => {
         router.push("/");
       }, 1000);
-      
+
     } catch (error) {
       // Show error toast
       toast.error("Login failed", {
@@ -97,102 +97,104 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center transition-colors duration-300 dark:bg-gray-900 6py-12 px-4 sm:px- lg:px-8">
-      <Button 
-        onClick={toggleDarkMode}
-        variant="ghost" 
-        size="icon" 
-        className="cursor-pointer absolute top-4 right-4 rounded-full h-10 w-10 hover:bg-gray-200 dark:hover:bg-gray-800"
-        aria-label="Toggle theme"
-      >
-        {isDarkMode ? (
-          <Sun size={20} className="text-yellow-400" />
-        ) : (
-          <Moon size={20} className="text-gray-700" />
-        )}
-      </Button>
+    <div className="flex items-center justify-center min-h-screen w-full overflow-hidden">
+    <Button 
+      onClick={toggleDarkMode}
+      variant="ghost" 
+      size="icon" 
+      className="cursor-pointer absolute top-4 right-4 rounded-full h-10 w-10 hover:bg-gray-200 dark:hover:bg-gray-800"
+      aria-label="Toggle theme"
+    >
+      {isDarkMode ? (
+        <Sun size={20} className="text-yellow-400" />
+      ) : (
+        <Moon size={20} className="text-gray-700" />
+      )}
+    </Button>
+  
+    {/* Shift card up using mt-[-3rem] */}
+    <Card className="w-full max-w-md border shadow-lg dark:border-gray-800 dark:bg-gray-800 mt-[-3rem]">
+      <CardHeader className="space-y-1">
+        <div className="flex justify-center mb-4">
+          <div className="p-3 rounded-full bg-gray-100 dark:bg-gray-700">
+            <LogIn className="h-8 w-8 text-gray-700 dark:text-gray-200" />
+          </div>
+        </div>
+        <CardTitle className="text-2xl font-bold text-center text-gray-800 dark:text-gray-100">Log In</CardTitle>
+        <CardDescription className="text-center text-gray-600 dark:text-gray-400">
+          Enter your credentials to access your account
+        </CardDescription>
+      </CardHeader>
       
-      <Card className="w-full max-w-md border shadow-lg dark:border-gray-800 dark:bg-gray-800">
-        <CardHeader className="space-y-1">
-          <div className="flex justify-center mb-4">
-            <div className="p-3 rounded-full bg-gray-100 dark:bg-gray-700">
-              <LogIn className="h-8 w-8 text-gray-700 dark:text-gray-200" />
-            </div>
-          </div>
-          <CardTitle className="text-2xl font-bold text-center text-gray-800 dark:text-gray-100">Log In</CardTitle>
-          <CardDescription className="text-center text-gray-600 dark:text-gray-400">
-            Enter your credentials to access your account
-          </CardDescription>
-        </CardHeader>
-        
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-700 dark:text-gray-200">Email</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="Enter your email" 
-                        type="email"
-                        className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormMessage className="text-red-500 dark:text-red-400" />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-700 dark:text-gray-200">Password</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="Enter your password" 
-                        type="password"
-                        className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormMessage className="text-red-500 dark:text-red-400" />
-                  </FormItem>
-                )}
-              />
-              
-              <Button 
-                type="submit" 
-                className="cursor-pointer w-full bg-gray-800 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white" 
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Logging in...
-                  </>
-                ) : (
-                  "Log In"
-                )}
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-        
-        <CardFooter className="flex flex-col space-y-4 border-t border-gray-200 dark:border-gray-700 pt-4">
-          <div className="text-center text-sm text-gray-600 dark:text-gray-400">
-            Don't have an account?{" "}
-            <Link href="/register" className="font-medium text-gray-800 dark:text-gray-200 hover:text-gray-600 dark:hover:text-gray-400">
-              Create account
-            </Link>
-          </div>
-        </CardFooter>
-      </Card>
-    </div>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-700 dark:text-gray-200">Email</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="Enter your email" 
+                      type="email"
+                      className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
+                      {...field} 
+                    />
+                  </FormControl>
+                  <FormMessage className="text-red-500 dark:text-red-400" />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-700 dark:text-gray-200">Password</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="Enter your password" 
+                      type="password"
+                      className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
+                      {...field} 
+                    />
+                  </FormControl>
+                  <FormMessage className="text-red-500 dark:text-red-400" />
+                </FormItem>
+              )}
+            />
+            
+            <Button 
+              type="submit" 
+              className="cursor-pointer w-full bg-gray-800 hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white" 
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Logging in...
+                </>
+              ) : (
+                "Log In"
+              )}
+            </Button>
+          </form>
+        </Form>
+      </CardContent>
+      
+      <CardFooter className="flex flex-col space-y-4 border-t border-gray-200 dark:border-gray-700 pt-4">
+        <div className="text-center text-sm text-gray-600 dark:text-gray-400">
+          Don't have an account?{" "}
+          <Link href="/register" className="font-medium text-gray-800 dark:text-gray-200 hover:text-gray-600 dark:hover:text-gray-400">
+            Create account
+          </Link>
+        </div>
+      </CardFooter>
+    </Card>
+  </div>
+  
   );
 }
