@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Toaster, toast } from "sonner";
+import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 
@@ -180,9 +180,6 @@ const AddSalesmanPage = () => {
           </Form>
         </CardContent>
       </Card>
-      
-      {/* Sonner Toaster component */}
-      <Toaster richColors closeButton position="top-right" />
     </div>
   );
 };

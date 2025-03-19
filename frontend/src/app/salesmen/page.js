@@ -116,9 +116,9 @@ export default function Salesmen() {
       cell: ({ row }) => {
         const status = row.getValue("is_inactive");
         return (
-          <div className="flex items-center">
+          <div className="m-4">
             <div
-              className={`mr-2 h-2 w-2 rounded-full ${
+              className={`h-3 w-3 rounded-full ${
                 status === 0 ? "bg-green-500" : "bg-red-500"
               }`}
             />

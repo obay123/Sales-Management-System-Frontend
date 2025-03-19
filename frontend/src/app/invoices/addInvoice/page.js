@@ -15,7 +15,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
-import { Toaster, toast } from "sonner"
+import { toast } from "sonner"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 // Define form validation schema using Zod
@@ -431,8 +431,6 @@ const AddInvoicePage = () => {
         </Form>
       </Card>
 
-      {/* Sonner Toaster component */}
-      <Toaster richColors closeButton position="top-right" />
     </div>
   )
 }

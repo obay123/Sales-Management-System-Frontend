@@ -11,7 +11,6 @@ export default function RootLayout({ children }) {
   const pathname = usePathname();
   const noLayoutPages = ["/login", "/register"];
   const isAuthPage = noLayoutPages.includes(pathname);
-  const [isHydrated, setIsHydrated] = useState(false);
 
   return (
     <html lang="en">
@@ -19,7 +18,7 @@ export default function RootLayout({ children }) {
         <Toaster position="top-center" richColors />
         <ProtectedRoute>
           {!isAuthPage && <OverlaySidebar />}
-          <main className="min-h-screen">{children}</main>
+          <main className="min-h-screen p-6 md:p-10 lg:p-12">{children}</main>
         </ProtectedRoute>
       </body>
     </html>

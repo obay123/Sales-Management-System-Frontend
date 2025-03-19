@@ -26,7 +26,6 @@ const OverlaySidebar = () => {
   const { logout } = userApi();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const pathname = usePathname();
   const [openDropdown, setOpenDropdown] = useState(null);
 
@@ -65,9 +64,26 @@ const OverlaySidebar = () => {
     setOpenDropdown(null);
   }, [pathname]);
 
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("theme") === "dark";
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [isDarkMode]);
+
   const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-    document.documentElement.classList.toggle("dark");
+    const newMode = !isDarkMode;
+    setIsDarkMode(newMode);
+    document.documentElement.classList.toggle("dark", newMode);
+    localStorage.setItem("theme", newMode ? "dark" : "light");
   };
 
   const toggleSidebar = () => {
@@ -128,7 +144,7 @@ const OverlaySidebar = () => {
       <button
         id="menu-button"
         onClick={toggleSidebar}
-        className="fixed top-4 left-4 z-30 p-2.5 rounded-full bg-gray-800 text-white shadow-lg hover:shadow-black/30 dark:hover:shadow-black/40 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-105 group"
+        className="cursor-pointer fixed top-4 left-4 z-30 p-2.5 rounded-full bg-gray-800 text-white shadow-lg hover:shadow-black/30 dark:hover:shadow-black/40 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-105 group"
         aria-label="Toggle sidebar"
       >
         <Menu
@@ -162,7 +178,7 @@ const OverlaySidebar = () => {
             </div>
             <button
               onClick={toggleSidebar}
-              className="p-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+              className="cursor-pointer p-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200"
               aria-label="Close sidebar"
             >
               <X size={20} className="text-gray-500 dark:text-gray-400" />
@@ -182,7 +198,7 @@ const OverlaySidebar = () => {
                     {link.hasDropdown ? (
                       <button
                         onClick={() => toggleDropdown(index)}
-                        className={`flex items-center justify-between w-full p-3 rounded-lg transition-all duration-200
+                        className={`cursor-pointer flex items-center justify-between w-full p-3 rounded-lg transition-all duration-200
                           ${
                             isActive
                               ? "bg-black-50 text-blue-700 dark:bg-black-900/30 dark:text-black-300 font-medium"
@@ -295,7 +311,7 @@ const OverlaySidebar = () => {
                   <span>{isDarkMode ? "Light Mode" : "Dark Mode"}</span>
                 </div>
                 <div
-                  className={`w-10 h-5 rounded-full ${
+                  className={`cursor-pointer w-10 h-5 rounded-full ${
                     isDarkMode ? "bg-blue-600" : "bg-gray-300"
                   } relative transition-colors duration-200`}
                 >
@@ -327,7 +343,10 @@ const OverlaySidebar = () => {
                   </p>
                 </div>
               </div>
-              <button onClick={handleLogout} className="p-2 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 transition-colors duration-200">
+              <button
+                onClick={handleLogout}
+                className="cursor-pointer p-2 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 transition-colors duration-200"
+              >
                 <LogOut size={18} />
               </button>
             </div>

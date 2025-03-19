@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Toaster, toast } from "sonner";
+import { toast } from "sonner";
 import { CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 
 // Define form validation schema using Zod
@@ -141,8 +141,6 @@ const AddItemPage = () => {
         </CardContent>
       </Card>
       
-      {/* Sonner Toaster component */}
-      <Toaster richColors closeButton position="top-right" />
     </div>
   );
 };
