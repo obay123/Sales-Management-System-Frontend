@@ -152,6 +152,32 @@ const useSalesmenApi = () => {
       throw error;
     }
   };
+  
+  const getSalesmenName = async () => {
+    const Token = getToken(); 
+    if (!Token) {
+      throw new Error("No auth token found");
+    }
+    try {
+      const response = await fetch(`/api/saleman/names`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${Token}`,
+          Accept:"application/json"
+        },
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to fetch salesmen names");
+      }
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching salesmen names:", error.message);
+      throw error;
+    }
+  };
+
   return {
     showSalesmen,
     updateSalesmen,
@@ -159,6 +185,7 @@ const useSalesmenApi = () => {
     getSalesmen,
     addSalesmen,
     bulkDeleteSalesmen,
+    getSalesmenName
   };
 };
 export default useSalesmenApi;
