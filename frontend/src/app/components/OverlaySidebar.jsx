@@ -162,8 +162,9 @@ const OverlaySidebar = () => {
       <button
         id="menu-button"
         onClick={toggleSidebar}
-        className="cursor-pointer fixed top-4 left-4 z-30 p-2.5 rounded-full bg-gray-800 text-white shadow-lg hover:shadow-black/30 dark:hover:shadow-black/40 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all duration-200 transform hover:scale-105 group"
+        className="cursor-pointer dark:bg-gray-800 fixed top-4 left-4 z-30 p-2.5 rounded-full bg-gray-900 text-white shadow-lg hover:shadow-black/30 dark:hover:shadow-black/40 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all duration-200 transform hover:scale-105 group"
         aria-label="Toggle sidebar"
+
       >
         <Menu
           size={20}

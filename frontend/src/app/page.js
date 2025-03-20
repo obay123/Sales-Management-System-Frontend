@@ -74,17 +74,17 @@ const Dashboard = ({
 
       {/* Sales Metrics Section */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <Card className="dark:border-gray-800 dark:bg-gray-800">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 ">
             <CardTitle className="text-sm font-medium">Total Sales</CardTitle>
             <CalendarDays className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="daily">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="daily">Daily</TabsTrigger>
-                <TabsTrigger value="weekly">Weekly</TabsTrigger>
-                <TabsTrigger value="monthly">Monthly</TabsTrigger>
+            <Tabs defaultValue="daily ">
+              <TabsList className="grid w-full grid-cols-3 dark:bg-gray-900 cursor-pointer">
+                <TabsTrigger value="daily" className="cursor-pointer">Daily</TabsTrigger>
+                <TabsTrigger value="weekly" className="cursor-pointer">Weekly</TabsTrigger>
+                <TabsTrigger value="monthly" className="cursor-pointer">Monthly</TabsTrigger>
               </TabsList>
               <TabsContent value="daily" className="pt-4">
                 <div className="text-2xl font-bold">{formatCurrency(displayData.salesData.daily)}</div>
@@ -111,7 +111,7 @@ const Dashboard = ({
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="dark:border-gray-800 dark:bg-gray-800">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">New Customers</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
@@ -125,13 +125,13 @@ const Dashboard = ({
           </CardContent>
         </Card>
 
-        <Card className="col-span-2">
+        <Card className="col-span-2 dark:border-gray-800 dark:bg-gray-800" >
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">Revenue Breakdown</CardTitle>
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent className="p-2">
-            <div className="h-32 flex items-center justify-center bg-slate-50 text-slate-500 rounded-md">
+            <div className="h-32 flex items-center justify-center bg-slate-50 text-slate-500 rounded-md dark:border-gray-800 dark:bg-gray-800">
               Sales Chart Visualization
             </div>
           </CardContent>
@@ -140,7 +140,7 @@ const Dashboard = ({
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         {/* Top Selling Products Section */}
-        <Card className="lg:col-span-3">
+        <Card className="lg:col-span-3 dark:border-gray-800 dark:bg-gray-800">
           <CardHeader>
             <CardTitle>Top Selling Products</CardTitle>
             <CardDescription>Products with the highest sales volume this month</CardDescription>
@@ -168,7 +168,7 @@ const Dashboard = ({
         </Card>
 
         {/* Latest Invoices Section */}
-        <Card className="lg:col-span-4">
+        <Card className="lg:col-span-4 dark:border-gray-800 dark:bg-gray-800">
           <CardHeader>
             <CardTitle>Latest Invoices</CardTitle>
             <CardDescription>Most recent invoices created in the system</CardDescription>
@@ -207,17 +207,17 @@ const Dashboard = ({
       </div>
 
       {/* Recently Added Customers */}
-      <Card>
+      <Card className="dark:border-gray-800 dark:bg-gray-800">
         <CardHeader>
           <CardTitle>Newly Added Customers</CardTitle>
           <CardDescription>Most recently added customers to the system</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className="space-y-4 ">
             {displayData.recentCustomers.map((customer) => (
-              <div key={customer.id} className="flex items-center justify-between">
+              <div key={customer.id} className="flex items-center justify-between"> 
                 <div className="flex items-center space-x-4">
-                  <Avatar>
+                  <Avatar >
                     <AvatarFallback>{customer.name.charAt(0)}{customer.name.split(' ')[1]?.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <div>
