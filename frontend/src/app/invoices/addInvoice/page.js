@@ -8,7 +8,7 @@ import * as z from "zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Calendar } from "@/components/ui/calendar"
-import { CalendarIcon, Loader2, Plus, Trash2 } from "lucide-react"
+import { CalendarIcon, Loader2, Plus, Trash2, CheckCircle2, Save, X } from "lucide-react"
 import { format } from "date-fns"
 import useCustomersApi from "@/api/CustomersApi"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -18,6 +18,8 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { toast } from "sonner"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
+import { useRouter } from "next/navigation"
+
 // Define form validation schema using Zod
 const invoiceItemSchema = z.object({
   item_code: z.string().min(1, { message: "Item code is required" }),
@@ -42,6 +44,7 @@ const AddInvoicePage = () => {
   const [items, setItems] = useState([])
   const [isLoadingCustomers, setIsLoadingCustomers] = useState(true)
   const [isLoadingItems, setIsLoadingItems] = useState(true)
+  const router = useRouter()
 
   // Initialize form with react-hook-form and zod validation
   const form = useForm({
@@ -109,7 +112,7 @@ const AddInvoicePage = () => {
     fetchItemsCode()
   }, [])
 
-  const onSubmit = async (values) => {
+  const handleSubmit = async (values, action) => {
     setIsSubmitting(true)
     try {
       // Format the data as required by your API
@@ -126,15 +129,21 @@ const AddInvoicePage = () => {
       await addInvoice(invoiceData)
 
       toast.success("Invoice added successfully", {
-        description: `Invoice has been created successfully.`,
+        description: "Invoice has been created successfully.",
       })
 
-      // Reset form to initial state
-      form.reset({
-        customer_id: "",
-        date: new Date(),
-        items: [{ item_code: "", quantity: 1, unit_price: 0 }],
-      })
+      // Handle different actions
+      if (action === "save_exit") {
+        // Navigate back to invoices list
+        router.push("/invoices")
+      } else if (action === "save_new") {
+        // Reset form to create new invoice
+        form.reset({
+          customer_id: "",
+          date: new Date(),
+          items: [{ item_code: "", quantity: 1, unit_price: 0 }],
+        })
+      }
     } catch (error) {
       toast.error("Error adding invoice", {
         description: error.message || "Please try again",
@@ -142,6 +151,11 @@ const AddInvoicePage = () => {
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  // Handle cancel
+  const handleCancel = () => {
+    router.push("/invoices")
   }
 
   // Calculate invoice total
@@ -158,7 +172,7 @@ const AddInvoicePage = () => {
         </CardHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+          <form onSubmit={form.handleSubmit((values) => handleSubmit(values, "save_exit"))}>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Customer Selection */}
@@ -412,26 +426,59 @@ const AddInvoicePage = () => {
               </div>
             </CardContent>
 
-            <CardFooter className="flex justify-end space-x-2">
-              <Button variant="outline" type="button" onClick={() => form.reset()}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Creating...
-                  </>
-                ) : (
-                  "Create Invoice"
-                )}
-              </Button>
+            <CardFooter>
+              <div className="flex flex-col sm:flex-row gap-3 pt-2 w-full">
+                <Button 
+                  type="button" 
+                  onClick={() => form.handleSubmit((values) => handleSubmit(values, "save_new"))()}
+                  disabled={isSubmitting}
+                  className="flex-1 cursor-pointer"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="mr-2 h-4 w-4" />
+                      Save and New
+                    </>
+                  )}
+                </Button>
+                <Button 
+                  type="submit" 
+                  disabled={isSubmitting}
+                  className="flex-1 cursor-pointer"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="mr-2 h-4 w-4" />
+                      Save and Exit
+                    </>
+                  )}
+                </Button>
+                <Button 
+                  type="button" 
+                  onClick={handleCancel}
+                  variant="outline"
+                  className="flex-1 cursor-pointer"
+                >
+                  <X className="mr-2 h-4 w-4" />
+                  Cancel
+                </Button>
+              </div>
             </CardFooter>
           </form>
         </Form>
       </Card>
-
     </div>
   )
 }
+
 export default AddInvoicePage

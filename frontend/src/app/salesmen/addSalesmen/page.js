@@ -10,8 +10,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, Save, CheckCircle2, X } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { useRouter } from "next/navigation";
 
 // Define form validation schema using Zod
 const formSchema = z.object({
@@ -27,6 +28,7 @@ const formSchema = z.object({
 const AddSalesmanPage = () => {
   const { addSalesmen } = useSalesmenApi();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
 
   // Initialize form with react-hook-form and zod validation
   const form = useForm({
@@ -40,7 +42,7 @@ const AddSalesmanPage = () => {
     },
   });
 
-  const onSubmit = async (values) => {
+  const handleSave = async (values, action) => {
     setIsSubmitting(true);
     
     try {
@@ -48,12 +50,17 @@ const AddSalesmanPage = () => {
       
       // Show success toast with Sonner
       toast.success("Salesman added successfully!", {
-        description: `${values.name} has been added to your team.`,
+        description:`${values.name} has been added to your team.`,
         duration: 5000,
       });
       
-      // Reset form
-      form.reset();
+      if (action === "new") {
+        // Reset form for a new entry
+        form.reset();
+      } else if (action === "exit") {
+        // Navigate back to salesmen list
+        router.push("/salesmen");
+      }
       
     } catch (error) {
       // Show error toast with Sonner
@@ -64,6 +71,11 @@ const AddSalesmanPage = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleCancel = () => {
+    // Navigate back without saving
+    router.push("/salesmen");
   };
 
   return (
@@ -78,7 +90,7 @@ const AddSalesmanPage = () => {
         
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit((values) => handleSave(values, "new"))} className="space-y-6">
               <FormField
                 control={form.control}
                 name="code"
@@ -166,16 +178,53 @@ const AddSalesmanPage = () => {
                 )}
               />
               
-              <Button type="submit" className="w-full" disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Adding...
-                  </>
-                ) : (
-                  "Add Salesman"
-                )}
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                <Button 
+                  type="button" 
+                  onClick={() => form.handleSubmit((values) => handleSave(values, "new"))()}
+                  disabled={isSubmitting}
+                  className="flex-1 cursor-pointer"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="mr-2 h-4 w-4" />
+                      Save and New
+                    </>
+                  )}
+                </Button>
+                <Button 
+                  type="button" 
+                  onClick={() => form.handleSubmit((values) => handleSave(values, "exit"))()}
+                  disabled={isSubmitting}
+                  className="flex-1 cursor-pointer"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="mr-2 h-4 w-4" />
+                      Save and Exit
+                    </>
+                  )}
+                </Button>
+                <Button 
+                  type="button" 
+                  onClick={handleCancel}
+                  variant="outline"
+                  className="flex-1 cursor-pointer" 
+                >
+                  <X className="mr-2 h-4 w-4" />
+                  Cancel
+                </Button>
+              </div>
             </form>
           </Form>
         </CardContent>

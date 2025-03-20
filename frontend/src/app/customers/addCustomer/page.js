@@ -15,6 +15,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
+import useSalesmenApi from "@/api/salesmenApi" 
+import { useRouter } from "next/navigation"
 
 // Define form validation schema using Zod
 const formSchema = z.object({
@@ -42,9 +45,12 @@ const formSchema = z.object({
 
 const AddCustomerPage = () => {
   const { addCustomer } = useCustomersApi()
-  const {getSalesmenName}  = useSalesmenApi()
+  const { getSalesmenName } = useSalesmenApi()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [photoPreview, setPhotoPreview] = useState(null)
+  const [salesmen, setSalesmen] = useState([])
+  const [isLoadingSalesmen, setIsLoadingSalesmen] = useState(true)
+  const router = useRouter()
 
   // Initialize form with react-hook-form and zod validation
   const form = useForm({
@@ -110,6 +116,11 @@ const AddCustomerPage = () => {
     }
   }
 
+  const handleCancel = () => {
+    // Navigate back without saving
+    router.push("/customers")
+  }
+
   const handleSave = async (values, action) => {
     setIsSubmitting(true)
     try {
@@ -127,11 +138,11 @@ const AddCustomerPage = () => {
       await addCustomer(customerData)
 
       toast.success("Customer added successfully", {
-        description: `Customer ${values.name} has been created successfully.`,
+        description: `Customer ${values.name} has bee created successfully.`,
       })
 
       if (action === "new") {
-        // Reset form for a new entry
+        // Reset form to add another customer
         form.reset({
           name: "",
           tel1: "",
@@ -159,11 +170,6 @@ const AddCustomerPage = () => {
     }
   }
 
-  const handleCancel = () => {
-    // Navigate back without saving
-    router.push("/customers")
-  }
-
   return (
     <div className="container max-w-4xl mx-auto py-10 px-4">
       <Card className="w-full border shadow-lg dark:border-gray-800 dark:bg-gray-800">
@@ -173,7 +179,10 @@ const AddCustomerPage = () => {
         </CardHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit((values) => handleSave(values, "new"))}>
+          <form onSubmit={(e) => {
+            e.preventDefault()
+            form.handleSubmit((values) => handleSave(values, "new"))(e)
+          }}>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Customer Name */}
@@ -425,8 +434,8 @@ const AddCustomerPage = () => {
             </CardContent>
 
             <CardFooter className="pt-4 flex flex-col sm:flex-row gap-3">
-              <Button 
-                type="button" 
+              <Button
+                type="button"
                 onClick={() => form.handleSubmit((values) => handleSave(values, "new"))()}
                 disabled={isSubmitting}
                 className="flex-1 cursor-pointer"
@@ -443,8 +452,8 @@ const AddCustomerPage = () => {
                   </>
                 )}
               </Button>
-              <Button 
-                type="button" 
+              <Button
+                type="button"
                 onClick={() => form.handleSubmit((values) => handleSave(values, "exit"))()}
                 disabled={isSubmitting}
                 className="flex-1 cursor-pointer"
@@ -461,8 +470,8 @@ const AddCustomerPage = () => {
                   </>
                 )}
               </Button>
-              <Button 
-                type="button" 
+              <Button
+                type="button"
                 onClick={handleCancel}
                 variant="outline"
                 className="flex-1 cursor-pointer"
@@ -479,4 +488,3 @@ const AddCustomerPage = () => {
 }
 
 export default AddCustomerPage
-
