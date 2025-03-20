@@ -7,7 +7,7 @@ import * as z from "zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Calendar } from "@/components/ui/calendar"
-import { CalendarIcon, Loader2, X } from "lucide-react"
+import { CalendarIcon, Loader2, X, Save, CheckCircle2 } from "lucide-react"
 import { format } from "date-fns"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -15,6 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
+import { useRouter } from "next/navigation"
 
 // Define form validation schema using Zod
 const formSchema = z.object({
@@ -44,6 +45,7 @@ const AddCustomerPage = () => {
   const { addCustomer } = useCustomersApi()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [photoPreview, setPhotoPreview] = useState(null)
+  const router = useRouter()
 
   // Initialize form with react-hook-form and zod validation
   const form = useForm({
@@ -84,7 +86,7 @@ const AddCustomerPage = () => {
     }
   }
 
-  const onSubmit = async (values) => {
+  const handleSave = async (values, action) => {
     setIsSubmitting(true)
     try {
       // Prepare the data
@@ -104,20 +106,25 @@ const AddCustomerPage = () => {
         description: `Customer ${values.name} has been created successfully.`,
       })
 
-      // Reset form
-      form.reset({
-        name: "",
-        tel1: "",
-        tel2: "",
-        address: "",
-        gender: "",
-        subscription_date: new Date(),
-        rate: 0,
-        tags: "",
-        salesmen_code: "",
-        photo: undefined,
-      })
-      setPhotoPreview(null)
+      if (action === "new") {
+        // Reset form for a new entry
+        form.reset({
+          name: "",
+          tel1: "",
+          tel2: "",
+          address: "",
+          gender: "",
+          subscription_date: new Date(),
+          rate: 0,
+          tags: "",
+          salesmen_code: "",
+          photo: undefined,
+        })
+        setPhotoPreview(null)
+      } else if (action === "exit") {
+        // Navigate back to customers list
+        router.push("/customers")
+      }
     } catch (error) {
       toast.error("Error adding customer", {
         description: error.message || "Please try again",
@@ -126,6 +133,11 @@ const AddCustomerPage = () => {
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  const handleCancel = () => {
+    // Navigate back without saving
+    router.push("/customers")
   }
 
   return (
@@ -137,7 +149,7 @@ const AddCustomerPage = () => {
         </CardHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+          <form onSubmit={form.handleSubmit((values) => handleSave(values, "new"))}>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Customer Name */}
@@ -340,19 +352,51 @@ const AddCustomerPage = () => {
               </div>
             </CardContent>
 
-            <CardFooter className="pt-4 flex justify-end space-x-2">
-              <Button variant="outline" type="button" onClick={() => form.reset()}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isSubmitting}>
+            <CardFooter className="pt-4 flex flex-col sm:flex-row gap-3">
+              <Button 
+                type="button" 
+                onClick={() => form.handleSubmit((values) => handleSave(values, "new"))()}
+                disabled={isSubmitting}
+                className="flex-1 cursor-pointer"
+              >
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Creating...
+                    Saving...
                   </>
                 ) : (
-                  "Create Customer"
+                  <>
+                    <Save className="mr-2 h-4 w-4" />
+                    Save and New
+                  </>
                 )}
+              </Button>
+              <Button 
+                type="button" 
+                onClick={() => form.handleSubmit((values) => handleSave(values, "exit"))()}
+                disabled={isSubmitting}
+                className="flex-1 cursor-pointer"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="mr-2 h-4 w-4" />
+                    Save and Exit
+                  </>
+                )}
+              </Button>
+              <Button 
+                type="button" 
+                onClick={handleCancel}
+                variant="outline"
+                className="flex-1 cursor-pointer"
+              >
+                <X className="mr-2 h-4 w-4" />
+                Cancel
               </Button>
             </CardFooter>
           </form>

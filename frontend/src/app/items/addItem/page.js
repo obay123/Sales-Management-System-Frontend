@@ -24,7 +24,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { toast } from "sonner";
-import { CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { CheckCircle2, AlertCircle, Loader2, Save, X, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 // Define form validation schema using Zod
 const formSchema = z.object({
@@ -36,6 +37,7 @@ const formSchema = z.object({
 const AddItemPage = () => {
   const { addItem } = useItemsApi();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -46,7 +48,7 @@ const AddItemPage = () => {
     },
   });
 
-  const onSubmit = async (values) => {
+  const handleSave = async (values, action) => {
     setIsSubmitting(true);
 
     try {
@@ -58,8 +60,13 @@ const AddItemPage = () => {
         duration: 5000,
       });
 
-      // Reset form
-      form.reset();
+      if (action === "new") {
+        // Reset form to add another item
+        form.reset();
+      } else if (action === "exit") {
+        // Navigate back to items list or dashboard
+        router.push("/items");
+      }
     } catch (error) {
       // Show error toast with Sonner
       toast.error("Error adding item", {
@@ -69,6 +76,11 @@ const AddItemPage = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleCancel = () => {
+    // Navigate back without saving
+    router.push("/items");
   };
 
   return (
@@ -84,7 +96,7 @@ const AddItemPage = () => {
 
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit((values) => handleSave(values, "new"))} className="space-y-6">
               <FormField
                 control={form.control}
                 name="code"
@@ -140,16 +152,53 @@ const AddItemPage = () => {
                 )}
               />
 
-              <Button type="submit" className="w-full" disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Adding...
-                  </>
-                ) : (
-                  "Add Item"
-                )}
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                <Button 
+                  type="button" 
+                  onClick={() => form.handleSubmit((values) => handleSave(values, "new"))()}
+                  disabled={isSubmitting}
+                  className="flex-1 cursor-pointer"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="mr-2 h-4 w-4" />
+                      Save and New
+                    </>
+                  )}
+                </Button>
+                <Button 
+                  type="button" 
+                  onClick={() => form.handleSubmit((values) => handleSave(values, "exit"))()}
+                  disabled={isSubmitting}
+                  className="flex-1 cursor-pointer"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="mr-2 h-4 w-4" />
+                      Save and Exit
+                    </>
+                  )}
+                </Button>
+                <Button 
+                  type="button" 
+                  onClick={handleCancel}
+                  variant="outline"
+                  className="flex-1 cursor-pointer"
+                >
+                  <X className="mr-2 h-4 w-4" />
+                  Cancel
+                </Button>
+              </div>
             </form>
           </Form>
         </CardContent>
