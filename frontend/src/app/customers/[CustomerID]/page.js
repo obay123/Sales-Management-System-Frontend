@@ -7,7 +7,7 @@ import * as z from "zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Calendar } from "@/components/ui/calendar"
-import { CalendarIcon, Loader2, X } from "lucide-react"
+import { CalendarIcon, Loader2, X, CheckCircle2 } from "lucide-react"
 import { format, parseISO } from "date-fns"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -15,7 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 
 // Define form validation schema using Zod
 const formSchema = z.object({
@@ -43,6 +43,7 @@ const formSchema = z.object({
 
 const EditCustomerPage = () => {
   const params = useParams()
+  const router = useRouter()
   const customerId = params?.CustomerID
   const { updateCustomer, showCustomer } = useCustomersApi()
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -100,7 +101,7 @@ const EditCustomerPage = () => {
         // If there's a photo URL, set the preview
         if (customer.photo_url) {
           setOriginalPhotoUrl(customer.photo_url) // Set the full photo URL from the response
-          setPhotoPreview(customer.photo_url)      // Set the preview URL for the image
+          setPhotoPreview(customer.photo_url) // Set the preview URL for the image
         }
       } catch (error) {
         toast.error("Error loading customer data", {
@@ -173,6 +174,9 @@ const EditCustomerPage = () => {
       toast.success("Customer updated successfully", {
         description: `Customer ${values.name} has been updated successfully.`,
       })
+
+      // Navigate back to customers page after successful update
+      router.push("/customers")
     } catch (error) {
       toast.error("Error updating customer", {
         description: error.message || "Please try again",
@@ -380,7 +384,7 @@ const EditCustomerPage = () => {
                             {photoPreview && (
                               <img
                                 className="w-full object-cover h-[200px] rounded-md border"
-                                src={photoPreview}
+                                src={photoPreview || "/placeholder.svg"}
                                 alt="Customer Photo Preview"
                               />
                             )}
@@ -394,11 +398,7 @@ const EditCustomerPage = () => {
                               Choose Photo
                             </Button>
                             {photoPreview && !photoRemoved && (
-                              <Button
-                                variant="destructive"
-                                className="w-full"
-                                onClick={handleRemovePhoto}
-                              >
+                              <Button variant="destructive" className="w-full" onClick={handleRemovePhoto}>
                                 Remove Photo
                               </Button>
                             )}
@@ -418,9 +418,21 @@ const EditCustomerPage = () => {
               </div>
             </CardContent>
 
-            <CardFooter>
+            <CardFooter className="flex justify-end gap-3">
+              <Button variant="outline" type="button" onClick={() => router.push("/customers")}>
+                Cancel
+              </Button>
               <Button variant="default" type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Saving..." : "Save Changes"}
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    Save & Exit
+                  </>
+                )}
               </Button>
             </CardFooter>
           </form>
@@ -431,3 +443,4 @@ const EditCustomerPage = () => {
 }
 
 export default EditCustomerPage
+
