@@ -1,32 +1,68 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import useInvoicesApi from "@/api/InvoicesApi"
-import useItemsApi from "@/api/ItemsApi"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm, useFieldArray } from "react-hook-form"
-import * as z from "zod"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Calendar } from "@/components/ui/calendar"
-import { CalendarIcon, Loader2, Plus, Trash2 } from "lucide-react"
-import { format, parse } from "date-fns"
-import useCustomersApi from "@/api/CustomersApi"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
-import { toast } from "sonner"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { cn } from "@/lib/utils"
-import { useParams } from "next/navigation"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import useInvoicesApi from "@/api/InvoicesApi";
+import useItemsApi from "@/api/ItemsApi";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, useFieldArray } from "react-hook-form";
+import * as z from "zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Calendar } from "@/components/ui/calendar";
+import { CalendarIcon, Loader2, Plus, Trash2 } from "lucide-react";
+import { format, parse } from "date-fns";
+import useCustomersApi from "@/api/CustomersApi";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { toast } from "sonner";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { cn } from "@/lib/utils";
+import { useParams } from "next/navigation";
 // Define form validation schema using Zod
 const invoiceItemSchema = z.object({
   item_code: z.string().min(1, { message: "Item code is required" }),
-  quantity: z.coerce.number().positive({ message: "Quantity must be positive" }),
-  unit_price: z.coerce.number().nonnegative({ message: "Price cannot be negative" }),
-})
+  quantity: z.coerce
+    .number()
+    .positive({ message: "Quantity must be positive" }),
+  unit_price: z.coerce
+    .number()
+    .nonnegative({ message: "Price cannot be negative" }),
+});
 
 const formSchema = z.object({
   customer_id: z.string().min(1, { message: "Customer is required" }),
@@ -34,21 +70,21 @@ const formSchema = z.object({
   items: z.array(invoiceItemSchema).min(1, {
     message: "At least one item is required",
   }),
-})
+});
 
 const EditInvoicePage = () => {
-  const params = useParams()
-  const router = useRouter()
-  const invoiceId = params?.InvoiceID
-  const { updateInvoice, showInvoice } = useInvoicesApi()
-  const { getItemsCode } = useItemsApi()
-  const { getCustomersName } = useCustomersApi()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-  const [customers, setCustomers] = useState([])
-  const [items, setItems] = useState([])
-  const [isLoadingCustomers, setIsLoadingCustomers] = useState(true)
-  const [isLoadingItems, setIsLoadingItems] = useState(true)
+  const params = useParams();
+  const router = useRouter();
+  const invoiceId = params?.InvoiceID;
+  const { updateInvoice, showInvoice } = useInvoicesApi();
+  const { getItemsCode } = useItemsApi();
+  const { getCustomersName } = useCustomersApi();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [customers, setCustomers] = useState([]);
+  const [items, setItems] = useState([]);
+  const [isLoadingCustomers, setIsLoadingCustomers] = useState(true);
+  const [isLoadingItems, setIsLoadingItems] = useState(true);
 
   // Initialize form with react-hook-form and zod validation
   const form = useForm({
@@ -58,114 +94,114 @@ const EditInvoicePage = () => {
       date: new Date(),
       items: [{ item_code: "", quantity: 1, unit_price: 0 }],
     },
-  })
+  });
 
   // Setup field array for dynamic invoice items
   const { fields, append, remove, replace } = useFieldArray({
     control: form.control,
     name: "items",
-  })
+  });
   // Fetch invoice data
   useEffect(() => {
     const fetchInvoiceData = async () => {
-      if (!invoiceId) return
+      if (!invoiceId) return;
 
-      setIsLoading(true)
+      setIsLoading(true);
       try {
-        const data = await showInvoice(invoiceId)
-        console.log("Invoice data received:", data)
+        const data = await showInvoice(invoiceId);
+        console.log("Invoice data received:", data);
         // setIsLoading(false)
         if (data && data.invoice) {
-          const invoice = data.invoice
+          const invoice = data.invoice;
 
           // Format the date
-          let invoiceDate
+          let invoiceDate;
           try {
-            invoiceDate = parse(invoice.date, "yyyy-MM-dd", new Date())
+            invoiceDate = parse(invoice.date, "yyyy-MM-dd", new Date());
           } catch (error) {
-            console.error("Error parsing date:", error)
-            invoiceDate = new Date()
+            console.error("Error parsing date:", error);
+            invoiceDate = new Date();
           }
 
           // Set form values
-          form.setValue("customer_id", invoice.customer_id.toString())
-          form.setValue("date", invoiceDate)
+          form.setValue("customer_id", invoice.customer_id.toString());
+          form.setValue("date", invoiceDate);
 
           // Format items
           const formattedItems = invoice.items.map((item) => ({
             item_code: item.code,
             quantity: item.pivot.quantity,
             unit_price: Number.parseFloat(item.pivot.unit_price),
-          }))
+          }));
 
           // Replace items in the form
-          replace(formattedItems)
+          replace(formattedItems);
         }
       } catch (error) {
-        console.error("Error fetching invoice:", error)
+        console.error("Error fetching invoice:", error);
         toast.error("Failed to load invoice", {
           description: error.message,
-        })
+        });
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchInvoiceData()
-  }, [])
+    fetchInvoiceData();
+  }, []);
 
   useEffect(() => {
     const fetchCustomerNames = async () => {
-      setIsLoadingCustomers(true)
+      setIsLoadingCustomers(true);
       try {
-        const data = await getCustomersName()
-        console.log("Customer data received:", data)
+        const data = await getCustomersName();
+        console.log("Customer data received:", data);
         if (data && Array.isArray(data.customers)) {
-          setCustomers(data.customers)
+          setCustomers(data.customers);
         } else {
-          console.error("Invalid customers data format:", data)
-          setCustomers([])
+          console.error("Invalid customers data format:", data);
+          setCustomers([]);
         }
       } catch (error) {
-        console.error("Error fetching customers:", error)
+        console.error("Error fetching customers:", error);
         toast.error("Failed to load customers", {
           description: error.message,
-        })
-        setCustomers([])
+        });
+        setCustomers([]);
       } finally {
-        setIsLoadingCustomers(false)
+        setIsLoadingCustomers(false);
       }
-    }
-    fetchCustomerNames()
-  }, [])
+    };
+    fetchCustomerNames();
+  }, []);
 
   useEffect(() => {
     const fetchItemsCode = async () => {
-      setIsLoadingItems(true)
+      setIsLoadingItems(true);
       try {
-        const data = await getItemsCode()
-        console.log("Items data received:", data)
+        const data = await getItemsCode();
+        console.log("Items data received:", data);
         if (data && Array.isArray(data.items)) {
-          setItems(data.items)
+          setItems(data.items);
         } else {
-          console.error("Invalid items data format:", data)
-          setItems([])
+          console.error("Invalid items data format:", data);
+          setItems([]);
         }
       } catch (error) {
-        console.error("Error fetching items:", error)
+        console.error("Error fetching items:", error);
         toast.error("Failed to load items", {
           description: error.message,
-        })
-        setItems([])
+        });
+        setItems([]);
       } finally {
-        setIsLoadingItems(false)
+        setIsLoadingItems(false);
       }
-    }
-    fetchItemsCode()
-  }, [])
+    };
+    fetchItemsCode();
+  }, []);
 
   const onSubmit = async (values) => {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
       // Format the data as required by your API
       const invoiceData = {
@@ -176,29 +212,35 @@ const EditInvoicePage = () => {
           quantity: Number.parseInt(item.quantity),
           unit_price: Number.parseFloat(item.unit_price),
         })),
-      }
+      };
 
-      await updateInvoice(invoiceId, invoiceData)
+      await updateInvoice(invoiceId, invoiceData);
 
       toast.success("Invoice updated successfully", {
         description: `Invoice has been updated successfully.`,
-      })
+      });
 
       // Navigate back to invoices list or detail page
-      router.push("/invoices")
+      router.push("/invoices");
     } catch (error) {
       toast.error("Error updating invoice", {
         description: error.message || "Please try again",
-      })
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   // Calculate invoice total
   const calculateTotal = () => {
-    return form.watch("items").reduce((sum, item) => sum + (Number(item.quantity) * Number(item.unit_price) || 0), 0)
-  }
+    return form
+      .watch("items")
+      .reduce(
+        (sum, item) =>
+          sum + (Number(item.quantity) * Number(item.unit_price) || 0),
+        0
+      );
+  };
 
   if (isLoading) {
     return (
@@ -206,12 +248,12 @@ const EditInvoicePage = () => {
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
         <span className="ml-2">Loading invoice data...</span>
       </div>
-    )
+    );
   }
 
   return (
     <div className="container max-w-4xl mx-auto py-10 px-4">
-      <Card>
+      <Card className="gray-800 dark:bg-gray-800">
         <CardHeader>
           <CardTitle className="text-2xl">Edit Invoice</CardTitle>
           <CardDescription>Update invoice details and items.</CardDescription>
@@ -234,14 +276,19 @@ const EditInvoicePage = () => {
                             <Button
                               variant="outline"
                               role="combobox"
-                              className={cn("w-full justify-between", !field.value && "text-muted-foreground")}
+                              className={cn(
+                                "w-full justify-between",
+                                !field.value && "text-muted-foreground"
+                              )}
                               disabled={isLoadingCustomers}
                             >
                               {isLoadingCustomers ? (
                                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                               ) : field.value ? (
-                                customers.find((customer) => customer.id.toString() === field.value)?.name ||
-                                "Select customer"
+                                customers.find(
+                                  (customer) =>
+                                    customer.id.toString() === field.value
+                                )?.name || "Select customer"
                               ) : (
                                 "Select customer"
                               )}
@@ -262,13 +309,19 @@ const EditInvoicePage = () => {
                                       value={customer.name}
                                       onSelect={(currentValue) => {
                                         const selectedCustomer = customers.find(
-                                          (c) => c.name.toLowerCase() === currentValue.toLowerCase(),
-                                        )
+                                          (c) =>
+                                            c.name.toLowerCase() ===
+                                            currentValue.toLowerCase()
+                                        );
                                         if (selectedCustomer) {
-                                          form.setValue("customer_id", selectedCustomer.id.toString(), {
-                                            shouldValidate: true,
-                                            shouldDirty: true,
-                                          })
+                                          form.setValue(
+                                            "customer_id",
+                                            selectedCustomer.id.toString(),
+                                            {
+                                              shouldValidate: true,
+                                              shouldDirty: true,
+                                            }
+                                          );
                                         }
                                       }}
                                     >
@@ -299,16 +352,25 @@ const EditInvoicePage = () => {
                               variant="outline"
                               className={cn(
                                 "w-full pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground",
+                                !field.value && "text-muted-foreground"
                               )}
                             >
-                              {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                              {field.value ? (
+                                format(field.value, "PPP")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
                               <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                             </Button>
                           </FormControl>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus />
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            initialFocus
+                          />
                         </PopoverContent>
                       </Popover>
                       <FormMessage />
@@ -325,7 +387,9 @@ const EditInvoicePage = () => {
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => append({ item_code: "", quantity: 1, unit_price: 0 })}
+                    onClick={() =>
+                      append({ item_code: "", quantity: 1, unit_price: 0 })
+                    }
                   >
                     <Plus className="mr-1 h-4 w-4" />
                     Add Item
@@ -360,14 +424,18 @@ const EditInvoicePage = () => {
                                             role="combobox"
                                             className={cn(
                                               "w-full justify-between",
-                                              !field.value && "text-muted-foreground",
+                                              !field.value &&
+                                                "text-muted-foreground"
                                             )}
                                             disabled={isLoadingItems}
                                           >
                                             {isLoadingItems ? (
                                               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                             ) : field.value ? (
-                                              items.find((item) => item.code === field.value)?.name || "Select item"
+                                              items.find(
+                                                (item) =>
+                                                  item.code === field.value
+                                              )?.name || "Select item"
                                             ) : (
                                               "Select item"
                                             )}
@@ -379,22 +447,33 @@ const EditInvoicePage = () => {
                                         <Command>
                                           <CommandInput placeholder="Search items..." />
                                           <CommandList>
-                                            <CommandEmpty>No item found.</CommandEmpty>
+                                            <CommandEmpty>
+                                              No item found.
+                                            </CommandEmpty>
                                             <CommandGroup>
                                               {Array.isArray(items) &&
                                                 items.map((item) => (
                                                   <CommandItem
                                                     key={item.code}
                                                     value={item.name}
-                                                    onSelect={(currentValue) => {
-                                                      const selectedItem = items.find(
-                                                        (i) => i.name.toLowerCase() === currentValue.toLowerCase(),
-                                                      )
+                                                    onSelect={(
+                                                      currentValue
+                                                    ) => {
+                                                      const selectedItem =
+                                                        items.find(
+                                                          (i) =>
+                                                            i.name.toLowerCase() ===
+                                                            currentValue.toLowerCase()
+                                                        );
                                                       if (selectedItem) {
-                                                        form.setValue(`items.${index}.item_code`, selectedItem.code, {
-                                                          shouldValidate: true,
-                                                          shouldDirty: true,
-                                                        })
+                                                        form.setValue(
+                                                          `items.${index}.item_code`,
+                                                          selectedItem.code,
+                                                          {
+                                                            shouldValidate: true,
+                                                            shouldDirty: true,
+                                                          }
+                                                        );
                                                       }
                                                     }}
                                                   >
@@ -419,7 +498,12 @@ const EditInvoicePage = () => {
                               render={({ field }) => (
                                 <FormItem className="mb-0">
                                   <FormControl>
-                                    <Input {...field} type="number" min="1" className="w-full" />
+                                    <Input
+                                      {...field}
+                                      type="number"
+                                      min="1"
+                                      className="w-full"
+                                    />
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
@@ -433,7 +517,13 @@ const EditInvoicePage = () => {
                               render={({ field }) => (
                                 <FormItem className="mb-0">
                                   <FormControl>
-                                    <Input {...field} type="number" step="0.01" min="0" className="w-full" />
+                                    <Input
+                                      {...field}
+                                      type="number"
+                                      step="0.01"
+                                      min="0"
+                                      className="w-full"
+                                    />
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
@@ -466,17 +556,26 @@ const EditInvoicePage = () => {
               </div>
 
               {/* Invoice Total */}
-              <div className="flex justify-end space-x-2 text-right">
+              <div className="flex justify-end space-x-2 text-right m-2">
                 <div className="font-semibold">Invoice Total:</div>
                 <div>${calculateTotal().toFixed(2)}</div>
               </div>
             </CardContent>
 
             <CardFooter className="flex justify-end space-x-2">
-              <Button variant="outline" type="button" onClick={() => router.push("/invoices")}>
+              <Button
+                variant="outline"
+                type="button"
+                onClick={() => router.push("/invoices")}
+                className="cursor-pointer"
+              >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="cursor-pointer"
+              >
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -491,8 +590,7 @@ const EditInvoicePage = () => {
         </Form>
       </Card>
     </div>
-  )
-}
+  );
+};
 
-export default EditInvoicePage
-
+export default EditInvoicePage;

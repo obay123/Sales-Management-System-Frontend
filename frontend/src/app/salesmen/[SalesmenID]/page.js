@@ -115,8 +115,8 @@ const EditSalesmanPage = () => {
   }
 
   return (
-    <div className="container max-w-2xl mx-auto py-10 px-4">
-      <Card>
+    <div className="container max-w-2xl mx-auto py-10 px-4 ">
+      <Card className="dark:border-gray-800 dark:bg-gray-800">
         <CardHeader>
           <CardTitle className="text-2xl">Edit Salesman</CardTitle>
           <CardDescription>Update salesman information and details.</CardDescription>
@@ -204,10 +204,10 @@ const EditSalesmanPage = () => {
               />
 
               <div className="flex justify-end space-x-2">
-                <Button variant="outline" type="button" onClick={() => router.push("/salesmen")}>
+                <Button variant="outline" type="button" onClick={() => router.push("/salesmen")} className="cursor-pointer">
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isSubmitting}>
+                <Button type="submit" disabled={isSubmitting} className="cursor-pointer">
                   {isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />

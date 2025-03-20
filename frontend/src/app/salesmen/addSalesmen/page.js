@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useState } from "react";
 import useSalesmenApi from "@/api/salesmenApi";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -7,8 +7,22 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { toast } from "sonner";
 import { Loader2, Save, CheckCircle2, X } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
@@ -18,7 +32,8 @@ import { useRouter } from "next/navigation";
 const formSchema = z.object({
   code: z.string().min(1, { message: "Salesman code is required" }),
   name: z.string().min(1, { message: "Name is required" }),
-  phone: z.string()
+  phone: z
+    .string()
     .min(1, { message: "Phone number is required" })
     .regex(/^[0-9+\-\s()]*$/, { message: "Please enter a valid phone number" }),
   address: z.string().optional(),
@@ -44,16 +59,16 @@ const AddSalesmanPage = () => {
 
   const handleSave = async (values, action) => {
     setIsSubmitting(true);
-    
+
     try {
       await addSalesmen(values);
-      
+
       // Show success toast with Sonner
       toast.success("Salesman added successfully!", {
-        description:`${values.name} has been added to your team.`,
+        description: `${values.name} has been added to your team.`,
         duration: 5000,
       });
-      
+
       if (action === "new") {
         // Reset form for a new entry
         form.reset();
@@ -61,7 +76,6 @@ const AddSalesmanPage = () => {
         // Navigate back to salesmen list
         router.push("/salesmen");
       }
-      
     } catch (error) {
       // Show error toast with Sonner
       toast.error("Error adding salesman", {
@@ -87,10 +101,15 @@ const AddSalesmanPage = () => {
             Add a new salesman to your team with their contact details.
           </CardDescription>
         </CardHeader>
-        
+
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit((values) => handleSave(values, "new"))} className="space-y-6">
+            <form
+              onSubmit={form.handleSubmit((values) =>
+                handleSave(values, "new")
+              )}
+              className="space-y-6"
+            >
               <FormField
                 control={form.control}
                 name="code"
@@ -107,7 +126,7 @@ const AddSalesmanPage = () => {
                   </FormItem>
                 )}
               />
-                
+
               <FormField
                 control={form.control}
                 name="name"
@@ -121,7 +140,7 @@ const AddSalesmanPage = () => {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="phone"
@@ -138,7 +157,7 @@ const AddSalesmanPage = () => {
                   </FormItem>
                 )}
               />
-                
+
               <FormField
                 control={form.control}
                 name="address"
@@ -146,26 +165,29 @@ const AddSalesmanPage = () => {
                   <FormItem>
                     <FormLabel>Address</FormLabel>
                     <FormControl>
-                      <Textarea 
-                        placeholder="Enter address (optional)" 
+                      <Textarea
+                        placeholder="Enter address (optional)"
                         className="resize-none"
-                        {...field} 
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="is_inactive"
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                     <div className="space-y-0.5">
-                      <FormLabel className="text-base">Inactive Status</FormLabel>
+                      <FormLabel className="text-base">
+                        Inactive Status
+                      </FormLabel>
                       <FormDescription>
-                        Mark as inactive if this salesman is not currently active.
+                        Mark as inactive if this salesman is not currently
+                        active.
                       </FormDescription>
                     </div>
                     <FormControl className="cursor-pointer">
@@ -177,11 +199,13 @@ const AddSalesmanPage = () => {
                   </FormItem>
                 )}
               />
-              
+
               <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                <Button 
-                  type="button" 
-                  onClick={() => form.handleSubmit((values) => handleSave(values, "new"))()}
+                <Button
+                  type="button"
+                  onClick={() =>
+                    form.handleSubmit((values) => handleSave(values, "new"))()
+                  }
                   disabled={isSubmitting}
                   className="flex-1 cursor-pointer"
                 >
@@ -197,9 +221,11 @@ const AddSalesmanPage = () => {
                     </>
                   )}
                 </Button>
-                <Button 
-                  type="button" 
-                  onClick={() => form.handleSubmit((values) => handleSave(values, "exit"))()}
+                <Button
+                  type="button"
+                  onClick={() =>
+                    form.handleSubmit((values) => handleSave(values, "exit"))()
+                  }
                   disabled={isSubmitting}
                   className="flex-1 cursor-pointer"
                 >
@@ -215,11 +241,11 @@ const AddSalesmanPage = () => {
                     </>
                   )}
                 </Button>
-                <Button 
-                  type="button" 
+                <Button
+                  type="button"
                   onClick={handleCancel}
                   variant="outline"
-                  className="flex-1 cursor-pointer" 
+                  className="flex-1 cursor-pointer"
                 >
                   <X className="mr-2 h-4 w-4" />
                   Cancel

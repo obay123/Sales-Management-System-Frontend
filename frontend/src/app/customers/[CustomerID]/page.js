@@ -7,15 +7,17 @@ import * as z from "zod"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Calendar } from "@/components/ui/calendar"
-import { CalendarIcon, Loader2, X } from "lucide-react"
+import { CalendarIcon, Loader2 } from "lucide-react"
 import { format, parseISO } from "date-fns"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "sonner"
-import { cn } from "@/lib/utils"
 import { useParams } from "next/navigation"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
+import useSalesmenApi from "@/api/salesmenApi"
+import { cn } from "@/lib/utils"
 
 // Define form validation schema using Zod
 const formSchema = z.object({
@@ -51,6 +53,8 @@ const EditCustomerPage = () => {
   const [originalPhotoUrl, setOriginalPhotoUrl] = useState(null)
   const [photoChanged, setPhotoChanged] = useState(false)
   const [photoRemoved, setPhotoRemoved] = useState(false)
+  const [salesmen, setSalesmen] = useState([])
+  const [isLoadingSalesmen, setIsLoadingSalesmen] = useState(true)
 
   // Initialize form with react-hook-form and zod validation
   const form = useForm({
@@ -100,7 +104,7 @@ const EditCustomerPage = () => {
         // If there's a photo URL, set the preview
         if (customer.photo_url) {
           setOriginalPhotoUrl(customer.photo_url) // Set the full photo URL from the response
-          setPhotoPreview(customer.photo_url)      // Set the preview URL for the image
+          setPhotoPreview(customer.photo_url) // Set the preview URL for the image
         }
       } catch (error) {
         toast.error("Error loading customer data", {
@@ -112,8 +116,32 @@ const EditCustomerPage = () => {
       }
     }
 
+    const fetchSalesmenNames = async () => {
+      setIsLoadingSalesmen(true)
+      try {
+        const { getSalesmenName } = useSalesmenApi()
+        const data = await getSalesmenName()
+        console.log("Salesmen data received:", data)
+        if (data && Array.isArray(data.salesmen)) {
+          setSalesmen(data.salesmen)
+        } else {
+          console.error("Invalid salesmen data format:", data)
+          setSalesmen([])
+        }
+      } catch (error) {
+        console.error("Error fetching salesmen:", error)
+        toast.error("Failed to load salesmen", {
+          description: error.message,
+        })
+        setSalesmen([])
+      } finally {
+        setIsLoadingSalesmen(false)
+      }
+    }
+
     if (customerId) {
       fetchCustomerData()
+      fetchSalesmenNames()
     }
   }, [customerId])
 
@@ -227,10 +255,58 @@ const EditCustomerPage = () => {
                   name="salesmen_code"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Salesman Code</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter salesman code" {...field} />
-                      </FormControl>
+                      <FormLabel>Salesman</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className={cn("w-full justify-between", !field.value && "text-muted-foreground")}
+                              disabled={isLoadingSalesmen}
+                            >
+                              {isLoadingSalesmen ? (
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              ) : field.value ? (
+                                salesmen.find((salesman) => salesman.code === field.value)?.name || "Select salesman"
+                              ) : (
+                                "Select salesman"
+                              )}
+                              <CalendarIcon className="ml-2 h-4 w-4 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[300px] p-0">
+                          <Command>
+                            <CommandInput placeholder="Search salesmen..." />
+                            <CommandList>
+                              <CommandEmpty>No salesman found.</CommandEmpty>
+                              <CommandGroup>
+                                {Array.isArray(salesmen) &&
+                                  salesmen.map((salesman) => (
+                                    <CommandItem
+                                      key={salesman.code}
+                                      value={salesman.name}
+                                      onSelect={(currentValue) => {
+                                        const selectedSalesman = salesmen.find(
+                                          (s) => s.name.toLowerCase() === currentValue.toLowerCase(),
+                                        )
+                                        if (selectedSalesman) {
+                                          form.setValue("salesmen_code", selectedSalesman.code, {
+                                            shouldValidate: true,
+                                            shouldDirty: true,
+                                          })
+                                        }
+                                      }}
+                                    >
+                                      {salesman.name}
+                                    </CommandItem>
+                                  ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -380,7 +456,7 @@ const EditCustomerPage = () => {
                             {photoPreview && (
                               <img
                                 className="w-full object-cover h-[200px] rounded-md border"
-                                src={photoPreview}
+                                src={photoPreview || "/placeholder.svg"}
                                 alt="Customer Photo Preview"
                               />
                             )}
@@ -394,11 +470,7 @@ const EditCustomerPage = () => {
                               Choose Photo
                             </Button>
                             {photoPreview && !photoRemoved && (
-                              <Button
-                                variant="destructive"
-                                className="w-full"
-                                onClick={handleRemovePhoto}
-                              >
+                              <Button variant="destructive" className="w-full" onClick={handleRemovePhoto}>
                                 Remove Photo
                               </Button>
                             )}
@@ -431,3 +503,4 @@ const EditCustomerPage = () => {
 }
 
 export default EditCustomerPage
+
