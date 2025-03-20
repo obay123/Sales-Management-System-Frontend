@@ -282,7 +282,6 @@ const EditCustomerPage = () => {
                         <SelectContent>
                           <SelectItem value="male">Male</SelectItem>
                           <SelectItem value="female">Female</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -346,7 +345,7 @@ const EditCustomerPage = () => {
                     <FormItem>
                       <FormLabel>Rate</FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.01" min="0" placeholder="Enter customer rate" {...field} />
+                        <Input type="number" step="1" min="0" max="5" placeholder="Enter customer rate" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
