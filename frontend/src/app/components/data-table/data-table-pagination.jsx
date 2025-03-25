@@ -36,9 +36,13 @@ export function DataTablePagination({ table }) {
             <SelectTrigger className="cursor-pointer h-8 w-[70px]">
               <SelectValue placeholder={table.getState().pagination.pageSize} />
             </SelectTrigger>
-            <SelectContent side="top">
+            <SelectContent side="top" className="dark:bg-gray-800">
               {[10, 20, 30, 40, 50].map((pageSize) => (
-                <SelectItem key={pageSize} value={`${pageSize}`}>
+                <SelectItem
+                  key={pageSize}
+                  value={`${pageSize}`}
+                  className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 dark:data-[state=checked]:bg-gray-900"
+                >
                   {pageSize}
                 </SelectItem>
               ))}

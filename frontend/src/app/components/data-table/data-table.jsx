@@ -40,11 +40,11 @@ import { DataTableViewOptions } from "./data-table-view-options";
 export function DataTable({
   columns,
   data,
-  filterColumn,
+  filterableColumns = [],
   onDeleteSelected,
   addUrl,
   addName,
-  exportName
+  exportName,
 }) {
   const [rowSelection, setRowSelection] = useState({});
   const [columnFilters, setColumnFilters] = useState([]);
@@ -86,16 +86,14 @@ export function DataTable({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        {filterColumn && (
-          <DataTableToolbar
-            table={table}
-            filterColumn={filterColumn}
-            addUrl={addUrl}
-            addName={addName}
-          />
-        )}
-        <DataTableViewOptions table={table} Export={exportName}/>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <DataTableToolbar
+          table={table}
+          filterableColumns={filterableColumns}
+          addUrl={addUrl}
+          addName={addName}
+        />
+        <DataTableViewOptions table={table} Export={exportName} />
       </div>
 
       {hasSelectedRows && (

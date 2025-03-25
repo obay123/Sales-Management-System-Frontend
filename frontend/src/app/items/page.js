@@ -9,6 +9,9 @@ import { DataTableRowActions } from "../components/data-table/data-table-row-act
 import { toast } from "sonner";
 
 export default function Items() {
+  const filterEquals = (row, columnId, filterValue) => {
+    return String(row.getValue(columnId)) === String(filterValue);
+  };
   const { getItems, deleteItem, bulkDeleteItems } = useItemsApi();
   const [items, setItems] = useState([]);
 
@@ -53,7 +56,6 @@ export default function Items() {
     }
   };
 
-
   const columns = [
     {
       id: "select",
@@ -85,6 +87,7 @@ export default function Items() {
         <DataTableColumnHeader column={column} title="Code" />
       ),
       enableSorting: true,
+      filterFn: filterEquals,
     },
     {
       accessorKey: "name",
@@ -92,6 +95,7 @@ export default function Items() {
         <DataTableColumnHeader column={column} title="Name" />
       ),
       enableSorting: true,
+      filterFn: filterEquals,
     },
     {
       accessorKey: "description",
@@ -99,6 +103,7 @@ export default function Items() {
         <DataTableColumnHeader column={column} title="Description" />
       ),
       enableSorting: true,
+      filterFn: filterEquals,
     },
     {
       id: "actions",
@@ -112,12 +117,14 @@ export default function Items() {
     },
   ];
 
+  const filterableColumns = ["code", "name", "description"];
+
   return (
     <div className="container mx-auto py-10">
       <DataTable
         columns={columns}
         data={items}
-        filterColumn="code"
+        filterableColumns={filterableColumns}
         onDeleteSelected={handleBulkDeleteItems}
         addUrl="/items/addItem"
         addName="Add Item"

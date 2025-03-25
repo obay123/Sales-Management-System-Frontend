@@ -43,7 +43,7 @@ export function DataTableViewOptions({ table, Export }) {
             View
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-[150px]">
+        <DropdownMenuContent align="end" className="w-[170px] dark:bg-gray-800">
           <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
           <DropdownMenuSeparator />
           {table
@@ -61,7 +61,7 @@ export function DataTableViewOptions({ table, Export }) {
               return (
                 <DropdownMenuCheckboxItem
                   key={column.id}
-                  className="capitalize"
+                  className="capitalize cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-900 "
                   checked={column.getIsVisible()}
                   onCheckedChange={(value) => column.toggleVisibility(!!value)}
                 >

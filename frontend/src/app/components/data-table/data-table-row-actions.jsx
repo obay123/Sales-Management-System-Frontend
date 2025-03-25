@@ -35,12 +35,12 @@ export function DataTableRowActions({ row, onEdit, onDelete }) {
           <MoreHorizontal className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent className="dark:bg-gray-900">
         {onEdit && (
           <DropdownMenuItem asChild>
             <button
               onClick={() => router.push(`${onEdit}`)}
-              className="w-full flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+              className="w-full flex items-center px-3 py-2 text-sm text-gray-400 dark:hover:bg-gray-800 cursor-pointer"
             >
               <Edit className="mr-2 h-4 w-4 text-gray-600" />
               Edit
@@ -50,12 +50,12 @@ export function DataTableRowActions({ row, onEdit, onDelete }) {
         {onDelete && (
           <>
             {onEdit && <DropdownMenuSeparator />}
-            <div className="w-full flex items-center px-3 py-2 text-sm text-red-600 hover:bg-gray-100">
+            <div className="w-full flex items-center px-3 py-2 text-sm text-red-600 cursor-pointer rounded-md hover:bg-gray-800">
               <DropdownMenuItem asChild>
                 <AlertDialog>
                   <AlertDialogTrigger>
-                    <div className="w-full flex items-center text-sm text-red-600 hover:bg-gray-100 cursor-pointer">
-                      <Trash className="mr-4 h-4 w-4" />
+                    <div className="w-full flex items-center text-sm text-red-600 cursor-pointer">
+                      <Trash className="mr-4 h-4 w-4 " />
                       Delete
                     </div>
                   </AlertDialogTrigger>

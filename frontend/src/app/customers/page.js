@@ -9,6 +9,11 @@ import { DataTableRowActions } from "../components/data-table/data-table-row-act
 import { toast } from "sonner";
 
 export default function Customers() {
+
+  const filterEquals = (row, columnId, filterValue) => {
+    return String(row.getValue(columnId)) === String(filterValue);
+  };
+  
   const [customers, setCustomers] = useState([]);
   const { getCustomers, deleteCustomer, bulkDeleteCustomers } =
     useCustomersApi();
@@ -29,7 +34,7 @@ export default function Customers() {
       console.error("Error fetching customers:", error);
     }
   };
-  
+
   const handleDeleteCustomer = async (id) => {
     try {
       await deleteCustomer(id);
@@ -87,6 +92,7 @@ export default function Customers() {
         <DataTableColumnHeader column={column} title="ID" />
       ),
       enableSorting: true,
+      filterFn: filterEquals,
     },
     {
       accessorKey: "user_id",
@@ -94,6 +100,7 @@ export default function Customers() {
         <DataTableColumnHeader column={column} title="User ID" />
       ),
       enableSorting: true,
+      filterFn: filterEquals,
     },
     {
       accessorKey: "salesmen_code",
@@ -101,6 +108,7 @@ export default function Customers() {
         <DataTableColumnHeader column={column} title="Salesmen Code" />
       ),
       enableSorting: true,
+      filterFn: filterEquals,
     },
 
     {
@@ -109,6 +117,7 @@ export default function Customers() {
         <DataTableColumnHeader column={column} title="Name" />
       ),
       enableSorting: true,
+      filterFn: filterEquals,
     },
     {
       accessorKey: "tel1",
@@ -116,6 +125,7 @@ export default function Customers() {
         <DataTableColumnHeader column={column} title="Tel 1" />
       ),
       enableSorting: true,
+      filterFn: filterEquals,
     },
     {
       accessorKey: "tel2",
@@ -123,6 +133,7 @@ export default function Customers() {
         <DataTableColumnHeader column={column} title="Tel 2" />
       ),
       enableSorting: true,
+      filterFn: filterEquals,
     },
     {
       accessorKey: "address",
@@ -130,6 +141,7 @@ export default function Customers() {
         <DataTableColumnHeader column={column} title="Address" />
       ),
       enableSorting: true,
+      filterFn: filterEquals,
     },
     {
       accessorKey: "gender",
@@ -137,13 +149,15 @@ export default function Customers() {
         <DataTableColumnHeader column={column} title="Gender" />
       ),
       enableSorting: true,
+      filterFn: filterEquals,
     },
     {
       accessorKey: "subscription_date",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Subscription Date" />
+        <DataTableColumnHeader column={column} title="Subscription_Date" />
       ),
       enableSorting: true,
+      filterFn: filterEquals,
     },
     {
       accessorKey: "rate",
@@ -151,13 +165,14 @@ export default function Customers() {
         <DataTableColumnHeader column={column} title="Rate" />
       ),
       enableSorting: true,
+      filterFn: filterEquals,
     },
     {
-      accessorKey: "photo_url", 
+      accessorKey: "photo_url",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Photo" />
       ),
-      cell: ({ row }) => (
+      cell: ({ row }) =>
         row.original.photo_url ? (
           <img
             src={row.original.photo_url}
@@ -166,9 +181,9 @@ export default function Customers() {
           />
         ) : (
           "No Image"
-        )
-      ),
+        ),
       enableSorting: false,
+      filterFn: filterEquals,
     },
     {
       accessorKey: "tags",
@@ -176,6 +191,7 @@ export default function Customers() {
         <DataTableColumnHeader column={column} title="Tags" />
       ),
       enableSorting: true,
+      filterFn: filterEquals,
     },
     {
       id: "actions",
@@ -189,12 +205,26 @@ export default function Customers() {
     },
   ];
 
+  const filterableColumns = [
+    "id",
+    "user_id",
+    "salesmen_code",
+    "name",
+    "tel1",
+    "tel2",
+    "address",
+    "gender",
+    "subscription_date",
+    "rate",
+    "tags"
+  ];
+
   return (
     <div className="container mx-auto py-10">
       <DataTable
         columns={columns}
         data={customers}
-        filterColumn="id"
+        filterableColumns={filterableColumns}
         onDeleteSelected={handleBulkDeleteCustomers}
         addUrl="/customers/addCustomer"
         addName="Add Customer"

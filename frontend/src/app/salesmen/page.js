@@ -9,6 +9,10 @@ import { DataTableRowActions } from "../components/data-table/data-table-row-act
 import { toast } from "sonner";
 
 export default function Salesmen() {
+  const filterEquals = (row, columnId, filterValue) => {
+    return String(row.getValue(columnId)) === String(filterValue);
+  };
+  
   const { getSalesmen, deleteSalesmen, bulkDeleteSalesmen } = useSalesmenApi();
   const [salesmen, setSalesmen] = useState([]);
 
@@ -88,6 +92,7 @@ export default function Salesmen() {
         <DataTableColumnHeader column={column} title="Code" />
       ),
       enableSorting: true,
+      filterFn: filterEquals,
     },
     {
       accessorKey: "name",
@@ -95,6 +100,7 @@ export default function Salesmen() {
         <DataTableColumnHeader column={column} title="Name" />
       ),
       enableSorting: true,
+      filterFn: filterEquals,
     },
     {
       accessorKey: "phone",
@@ -102,6 +108,7 @@ export default function Salesmen() {
         <DataTableColumnHeader column={column} title="Phone" />
       ),
       enableSorting: true,
+      filterFn: filterEquals,
     },
     {
       accessorKey: "address",
@@ -109,6 +116,7 @@ export default function Salesmen() {
         <DataTableColumnHeader column={column} title="Address" />
       ),
       enableSorting: true,
+      filterFn: filterEquals,
     },
     {
       accessorKey: "is_inactive",
@@ -128,6 +136,7 @@ export default function Salesmen() {
         );
       },
       enableSorting: true,
+      filterFn: filterEquals,
     },
     {
       id: "actions",
@@ -141,12 +150,14 @@ export default function Salesmen() {
     },
   ];
 
+  const filterableColumns = ["code", "name", "phone", "address", "is_inactive"];
+
   return (
     <div className="container mx-auto py-10">
       <DataTable
         columns={columns}
         data={salesmen}
-        filterColumn="code"
+        filterableColumns={filterableColumns}
         onDeleteSelected={handleBulkDeleteSalesmen}
         addUrl="/salesmen/addSalesmen"
         addName="Add Saleman"

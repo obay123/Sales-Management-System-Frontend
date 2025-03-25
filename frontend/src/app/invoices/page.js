@@ -8,6 +8,9 @@ import { DataTableRowActions } from "../components/data-table/data-table-row-act
 import { toast } from "sonner";
 
 export default function Invoices() {
+  const filterEquals = (row, columnId, filterValue) => {
+    return String(row.getValue(columnId)) === String(filterValue);
+  };
   const [invoices, setInvoices] = useState([]);
   const { getInvoices, deleteInvoice, bulkDeleteInvoices } = useInvoicesApi();
 
@@ -85,6 +88,7 @@ export default function Invoices() {
         <DataTableColumnHeader column={column} title="ID" />
       ),
       enableSorting: true,
+      filterFn: filterEquals,
     },
     {
       accessorKey: "user_id",
@@ -92,6 +96,7 @@ export default function Invoices() {
         <DataTableColumnHeader column={column} title="User ID" />
       ),
       enableSorting: true,
+      filterFn: filterEquals,
     },
     {
       accessorKey: "customer_id",
@@ -99,6 +104,7 @@ export default function Invoices() {
         <DataTableColumnHeader column={column} title="Customer ID" />
       ),
       enableSorting: true,
+      filterFn: filterEquals,
     },
 
     {
@@ -107,6 +113,7 @@ export default function Invoices() {
         <DataTableColumnHeader column={column} title="Total Quantity" />
       ),
       enableSorting: true,
+      filterFn: filterEquals,
     },
     {
       accessorKey: "total_price",
@@ -114,6 +121,7 @@ export default function Invoices() {
         <DataTableColumnHeader column={column} title="Total Price" />
       ),
       enableSorting: true,
+      filterFn: filterEquals,
     },
     {
       accessorKey: "date",
@@ -121,6 +129,7 @@ export default function Invoices() {
         <DataTableColumnHeader column={column} title="Date" />
       ),
       enableSorting: true,
+      filterFn: filterEquals,
     },
     {
       id: "actions",
@@ -133,12 +142,22 @@ export default function Invoices() {
       ),
     },
   ];
+
+  const filterableColumns = [
+    "id",
+    "user_id",
+    "customer_id",
+    "total_quantity",
+    "total_price",
+    "date",
+  ];
+
   return (
     <div className="container mx-auto py-10">
       <DataTable
         columns={columns}
         data={invoices}
-        filterColumn="id"
+        filterableColumns={filterableColumns}
         onDeleteSelected={handleBulkDeleteInvoices}
         addUrl="/invoices/addInvoice"
         addName="Add Invoice"
