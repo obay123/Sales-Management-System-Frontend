@@ -19,6 +19,7 @@ import {
   CommandInput,
   CommandItem,
 } from "@/components/ui/command";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export function DataTableToolbar({
   table,
@@ -132,7 +133,7 @@ export function DataTableToolbar({
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button variant="outline" size="sm" className="h-8 cursor-pointer">
-            <Filter className="mr-2 h-4 w-4" />
+            <Filter className="mr-2 h-4 w-4 " />
             Filter
             {isFiltered && (
               <Badge
@@ -145,29 +146,29 @@ export function DataTableToolbar({
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="w-[240px] p-0 dark:bg-gray-800"
+          className="w-[230px] p-0 dark:bg-gray-800"
           align="start"
         >
-          <div className="p-2 grid gap-4 ">
+          <div className="p-2 grid gap-4">
             <div className="font-medium">Filter by column</div>
             <Separator />
-            <div className="grid gap-3 ">
-              {filterableColumns.map((columnId) => {
-                const column = table.getColumn(columnId);
-                if (!column) return null;
+            <ScrollArea className="max-h-[400px]">
+              <div className="grid gap-3 ">
+                {filterableColumns.map((columnId) => {
+                  const column = table.getColumn(columnId);
+                  if (!column) return null;
 
-                return (
-                  <div key={columnId} className="grid gap-1">
-                    <div className="text-sm font-medium ">
-                      {getColumnHeaderText(column)}
+                  return (
+                    <div key={columnId} className="grid gap-1">
+                      <div className="text-sm font-medium ">
+                        {getColumnHeaderText(column)}
+                      </div>
+                      <div>{getFilterInput(column)}</div>
                     </div>
-                    <div>
-                      {getFilterInput(column)}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            </ScrollArea>
           </div>
         </PopoverContent>
       </Popover>

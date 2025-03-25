@@ -9,11 +9,10 @@ import { DataTableRowActions } from "../components/data-table/data-table-row-act
 import { toast } from "sonner";
 
 export default function Customers() {
-
   const filterEquals = (row, columnId, filterValue) => {
     return String(row.getValue(columnId)) === String(filterValue);
   };
-  
+
   const [customers, setCustomers] = useState([]);
   const { getCustomers, deleteCustomer, bulkDeleteCustomers } =
     useCustomersApi();
@@ -120,6 +119,24 @@ export default function Customers() {
       filterFn: filterEquals,
     },
     {
+      accessorKey: "photo_url",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Photo" />
+      ),
+      cell: ({ row }) =>
+        row.original.photo_url ? (
+          <img
+            src={row.original.photo_url}
+            alt="Customer"
+            className="w-16 h-16 rounded-full object-cover"
+          />
+        ) : (
+          "No Image"
+        ),
+      enableSorting: false,
+      filterFn: filterEquals,
+    },
+    {
       accessorKey: "tel1",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Tel 1" />
@@ -168,24 +185,6 @@ export default function Customers() {
       filterFn: filterEquals,
     },
     {
-      accessorKey: "photo_url",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Photo" />
-      ),
-      cell: ({ row }) =>
-        row.original.photo_url ? (
-          <img
-            src={row.original.photo_url}
-            alt="Customer"
-            className="w-16 h-16 rounded-full object-cover"
-          />
-        ) : (
-          "No Image"
-        ),
-      enableSorting: false,
-      filterFn: filterEquals,
-    },
-    {
       accessorKey: "tags",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Tags" />
@@ -216,7 +215,7 @@ export default function Customers() {
     "gender",
     "subscription_date",
     "rate",
-    "tags"
+    "tags",
   ];
 
   return (
