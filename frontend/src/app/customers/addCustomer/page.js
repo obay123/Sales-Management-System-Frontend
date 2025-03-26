@@ -181,7 +181,7 @@
             address: "",
             gender: "",
             subscription_date: new Date(),
-            rate: 0,
+            rate: 1,
             tags: "",
             salesmen_code: "",
             photo: undefined,
